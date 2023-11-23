@@ -4,9 +4,11 @@ import requests
 import openai
 import json
 import os
+from dotenv import load_dotenv
+load_dotenv()
 
 app = FastAPI()
-openai.api_key=os.environ['API_KEY']
+openai.api_key=os.getenv('API_KEY')
 
 class User(BaseModel):
     message: str
@@ -14,10 +16,9 @@ class User(BaseModel):
 
 app = FastAPI()
 
-async def get_date_from_external_api():
+def get_date_from_external_api():
         """get date from an external api"""
-
-        api_url = "http://disal.mibot.cl/api2.php"
+        api_url = os.getenv('DATE_URL')
         response = requests.get(api_url)
         if response.status_code == 200:
             return response.json()
@@ -25,10 +26,15 @@ async def get_date_from_external_api():
             return {"error": f"Error al consumir la API externa. Código de estado: {response.status_code}"}
 
 
+def get_date_from_body():
+    """give an response with an external date"""
+    date = get_date_from_external_api()
+    return json.dumps({"date": date})
+
 @app.post("/items/")
 async def run_conversation(user: User):
+        res = user.message
         try:
-            response = await get_date_from_external_api()
             # Step 1: send the conversation and available functions to the model
             messages=[
                 {
@@ -37,24 +43,18 @@ async def run_conversation(user: User):
                 },
                 {
                     'role':'user',
-                    'content': f'{user}'
+                    'content': res
                 }
             ]
             tools = [
                 {
                     "type": "function",
                     "function": {
-                        "name": "get_date_from_external_api",
-                        "description": "get date from an external api",
-                        "parameters": { ## PARAMETROS SI NO ES UN POST
+                        "name": "get_date_from_body",
+                        "description": "give an response with an external date, not the wheater",
+                        "parameters": {
                             "type": "object",
-                            "properties": {
-                                "message": {
-                                    "type": "string",
-                                    "description": "me puedes decir la fecha?",
-                                },
-                            },
-                            "required": ["message"],
+                            "properties": {}
                         },
                     },
                 }
@@ -63,7 +63,7 @@ async def run_conversation(user: User):
                 model="gpt-3.5-turbo-1106",
                 messages=messages,
                 tools=tools,
-                tool_choice="auto",  # auto is default, but we'll be explicit
+                tool_choice='auto'
             )
             response_message = response.choices[0].message
 
@@ -73,17 +73,14 @@ async def run_conversation(user: User):
                 # Step 3: call the function
                 # Note: the JSON response may not always be valid; be sure to handle errors
                 available_functions = {
-                    "get_date_from_external_api": get_date_from_external_api,
+                    "get_date_from_body": get_date_from_body,
                 }
                 messages.append(response_message)  # extend conversation with assistant's reply
                 # Step 4: send the info for each function call and function response to the model
                 for tool_call in tool_calls:
                     function_name = tool_call.function.name
                     function_to_call = available_functions[function_name]
-                    function_args = json.loads(tool_call.function.arguments)
-                    function_response = function_to_call(
-                        message=function_args.get("message"),
-                    )
+                    function_response = function_to_call()
                     messages.append(
                         {
                             "tool_call_id": tool_call.id,
@@ -96,6 +93,10 @@ async def run_conversation(user: User):
                     model="gpt-3.5-turbo-1106",
                     messages=messages,
                 )
-                return second_response
+                print(f'if: {second_response}')
+                return {'message':second_response.choices[0].message.content}
+            else:
+                 print(f'else: {response_message}')
+                 return {'message': response_message.content}
         except TypeError as e:
             return e
