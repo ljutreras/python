@@ -1,12 +1,12 @@
 from pydantic import BaseModel
 from fastapi import FastAPI
-import re
-import httpx
+import requests
 import openai
 import json
+import os
 
 app = FastAPI()
-openai.api_key='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'
+openai.api_key=os.environ['API_KEY']
 
 class User(BaseModel):
     message: str
@@ -15,12 +15,10 @@ class User(BaseModel):
 app = FastAPI()
 
 async def get_date_from_external_api():
+        """get date from an external api"""
 
         api_url = "http://disal.mibot.cl/api2.php"
-
-        async with httpx.AsyncClient() as client:
-            response = await client.get(api_url)
-
+        response = requests.get(api_url)
         if response.status_code == 200:
             return response.json()
         else:
@@ -47,7 +45,7 @@ async def run_conversation(user: User):
                     "type": "function",
                     "function": {
                         "name": "get_date_from_external_api",
-                        "description": "Get date from an external api",
+                        "description": "get date from an external api",
                         "parameters": { ## PARAMETROS SI NO ES UN POST
                             "type": "object",
                             "properties": {
