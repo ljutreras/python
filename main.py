@@ -1,12 +1,12 @@
 from pydantic import BaseModel
 from fastapi import FastAPI
-import re
+import os
 import httpx
 import openai
 import json
 
 app = FastAPI()
-openai.api_key='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'
+openai.api_key=os.environ['API_KEY']
 
 class User(BaseModel):
     message: str
