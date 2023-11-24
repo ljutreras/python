@@ -1,3 +1,4 @@
+from typing import Optional
 import requests
 import openai
 import json
@@ -12,10 +13,10 @@ import mysql.connector
 load_dotenv()
 
 app = FastAPI()
-uid = str(uuid.uuid4())
 openai.api_key=os.getenv('API_KEY')
 
 class User(BaseModel):
+    id: Optional[str] = ''
     message: str
     
 
@@ -26,7 +27,7 @@ def connect_to_database():
             host = "localhost",
             user = "root",
             password = os.getenv('DB_PASSWORD'),
-            database = "chatgpt"
+            database = "history_chat"
         )
         return connection
     except mysql.connector.errors as e:
@@ -36,95 +37,120 @@ def connect_to_database():
 connection = connect_to_database()
 cursor = connection.cursor()
 
-def get_date_from_external_api():
-        """get date from an external api"""
-        api_url = os.getenv('DATE_URL')
-        response = requests.get(api_url)
-        if response.status_code == 200:
-            return response.json()
-        else:
-            return {"error": f"Error al consumir la API externa. Código de estado: {response.status_code}"}
 
+def web_fecha():
+    url = 'http://disal.mibot.cl/api2.php'
+    respuesta = requests.get(url)
+    if respuesta.status_code == 200:
+        data = respuesta.json()
+        print("respuesta de la API WEB: ", data)
+        fecha = data.get('fecha_actual', 'No disponible')
+        return fecha
+    else:
+        return "Error al obtener la fecha"
+    
 
-def get_date_from_body():
-    """give an response with an external date"""
-    date = get_date_from_external_api()
-    return json.dumps({"date": date})
+def get_current_date():
+    fecha_actual = web_fecha()
+    return json.dumps({"fecha": fecha_actual})
 
-@app.post("/items/")
-async def run_conversation(user: User):
-        res = user.message
-        try:
-            # Step 1: send the conversation and available functions to the model
-            messages=[
+def insertBD(uid, role, content, id_bot):
+    connection = connect_to_database()
+    if connection:
+        cursor = connection.cursor()
+
+        if role == 'user':
+            insert_query = "INSERT INTO chats(uid, role, content, date, id_bot) VALUES(%s, %s, %s, NOW(), %s)"
+            cursor.execute(insert_query, (uid, role, content, id_bot))
+        elif role == 'assistant':
+            insert_query = "INSERT INTO chats(uid, role, content, date, id_bot) VALUES(%s, %s, %s, DATE_ADD(NOW(), INTERVAL 1 SECOND), %s)"
+            cursor.execute(insert_query, (uid, role, content, id_bot))
+        
+        connection.commit()
+        cursor.close()
+        connection.close()
+
+@app.post("/consulta")
+def ask_mia(user: User):
+    uid = str(uuid.uuid4())
+    user_id = uid if user.id == '' else user.id
+    query = f"SELECT content FROM chats WHERE uid = '{user_id}' AND role = 'user' ORDER BY date ASC"
+    cursor.execute(query)
+    print("🚀 ~ file: excercise2.py:80 ~ cursor:", cursor)
+    res = cursor.fetchall()
+    print("🚀 ~ file: excercise2.py:81 ~ res:", res)
+    for resultado in res:
+        res_for = resultado[0]
+
+    res_content = res_for if user.id != None else ''
+
+    messages=[
                 {
                     'role': 'system',
                     'content':'Eres una agente virtual llamada MIA y tu objetivo es decir la fecha'
                 },
                 {
                     'role':'user',
-                    'content': res
+                    'content': res_content + ' ' + user.message
                 }
-            ]
-            tools = [
-                {
-                    "type": "function",
-                    "function": {
-                        "name": "get_date_from_body",
-                        "description": "give an response with an external date, not the wheater",
-                        "parameters": {
-                            "type": "object",
-                            "properties": {}
-                        },
-                    },
+            ]    
+    tools = [
+        {
+            "type": "function",
+            "function": {
+                "name": "get_current_date",
+                "description": "Get the current date from a specific web page",
+                "parameters": {
+                    "type": "object",
+                    "properties": {}
                 }
-            ]
-            response = openai.chat.completions.create(
-                model="gpt-3.5-turbo-1106",
-                messages=messages,
-                tools=tools,
-                tool_choice='auto'
-            )
-            response_message = response.choices[0].message
+            },
+        }
+    ]
+    response = openai.chat.completions.create(
+        model="gpt-3.5-turbo-1106",
+        messages=messages,
+        tools=tools,
+        tool_choice="auto",
+    )
 
-            tool_calls = response_message.tool_calls
-            # Step 2: check if the model wanted to call a function
-            if tool_calls:
-                # Step 3: call the function
-                # Note: the JSON response may not always be valid; be sure to handle errors
-                available_functions = {
-                    "get_date_from_body": get_date_from_body,
+    response_content = response.choices[0].message.content if response.choices else ""
+   
+
+    response_message = response.choices[0].message
+    tool_calls = response_message.tool_calls
+
+    if tool_calls:
+        available_functions = {"get_current_date": get_current_date}
+        messages.append(response_message)
+
+        for tool_call in tool_calls:
+            function_name = tool_call.function.name
+            function_to_call = available_functions[function_name]
+            function_response = function_to_call()
+            messages.append(
+                {
+                    "tool_call_id": tool_call.id,
+                    "role": "tool",
+                    "name": function_name,
+                    "content": function_response,
                 }
-                messages.append(response_message)  # extend conversation with assistant's reply
-                # Step 4: send the info for each function call and function response to the model
-                for tool_call in tool_calls:
-                    function_name = tool_call.function.name
-                    function_to_call = available_functions[function_name]
-                    function_response = function_to_call()
-                    messages.append(
-                        {
-                            "tool_call_id": tool_call.id,
-                            "role": "tool",
-                            "name": function_name,
-                            "content": function_response,
-                        }
-                    )  # extend conversation with function response
-                second_response = openai.chat.completions.create(
-                    model="gpt-3.5-turbo-1106",
-                    messages=messages,
-                )
-                
-                if connection:
-                    cursor.execute(insert_query('users'), (uid, 'user', user.message))
-                    cursor.execute(insert_query('assistant'),(uid, second_response.choices[0].message.role, second_response.choices[0].message.content))
-                    connection.commit()
-                    cursor.close()
-                    connection.close()
-                    
-            
-                return {'message':second_response.choices[0].message.content}
-            else:
-                 print(f'else: {response_message}')
-                 return {'message': response_message.content}
-        except TypeError as e:
-            return e
+            )
+
+        second_response = openai.chat.completions.create(
+            model="gpt-3.5-turbo-1106",
+            messages=messages,
+        )
+        insertBD(user_id, 'user', user.message, 1)
+        insertBD(user_id, 'assistant', second_response.choices[0].message.content, 1)
+
+        return {'id': user_id, 'message':second_response.choices[0].message.content}
+
+    else:
+        insertBD(user_id, 'user', user.message, 1)
+        insertBD(user_id, 'assistant', response_content, 1)
+        return {'id': user_id, "message": response_message.content}
+
+if __name__ == "__main__":
+    import uvicorn
+    uvicorn.run(app, host="0.0.0.0", port=8000)
