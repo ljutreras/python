@@ -3,10 +3,22 @@ import openai
 import json
 import os
 import uuid
+from mysql_repository import insert_query
 from pydantic import BaseModel
 from fastapi import FastAPI
 from dotenv import load_dotenv
 import mysql.connector
+
+load_dotenv()
+
+app = FastAPI()
+uid = str(uuid.uuid4())
+openai.api_key=os.getenv('API_KEY')
+
+class User(BaseModel):
+    message: str
+    
+
 
 def connect_to_database():
     try:
@@ -21,16 +33,8 @@ def connect_to_database():
         print("Error al conectar a MySQL", e)
         return None
 
-load_dotenv()
-
-app = FastAPI()
-openai.api_key=os.getenv('API_KEY')
-
-class User(BaseModel):
-    message: str
-
-
-app = FastAPI()
+connection = connect_to_database()
+cursor = connection.cursor()
 
 def get_date_from_external_api():
         """get date from an external api"""
@@ -110,20 +114,9 @@ async def run_conversation(user: User):
                     messages=messages,
                 )
                 
-                connection = connect_to_database()
                 if connection:
-                    cursor = connection.cursor()
-                    #insertar los datos
-                    assistant_query = "INSERT INTO assistant(uid, role, content, date) VALUES (%s, %s, %s, DATE_ADD(NOW(), INTERVAL 1 SECOND))"
-                    user_query = "INSERT INTO user(uid, role, content, date) VALUES (%s, %s, %s, NOW())"
-                    uid = str(uuid.uuid4())
-                    response_content_assistant = second_response.choices[0].message.content
-                    response_role_assistant = second_response.choices[0].message.role
-                    response_content = user.message
-                    response_role = 'user'
-                    cursor.execute(user_query, (uid, response_role, response_content))
-                    cursor.execute(assistant_query, (uid, response_role_assistant, response_content_assistant))
-                    
+                    cursor.execute(insert_query('users'), (uid, 'user', user.message))
+                    cursor.execute(insert_query('assistant'),(uid, second_response.choices[0].message.role, second_response.choices[0].message.content))
                     connection.commit()
                     cursor.close()
                     connection.close()
