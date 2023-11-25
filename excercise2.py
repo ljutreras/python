@@ -4,7 +4,6 @@ import openai
 import json
 import os
 import uuid
-from mysql_repository import insert_query
 from pydantic import BaseModel
 from fastapi import FastAPI
 from dotenv import load_dotenv
@@ -72,17 +71,17 @@ def insertBD(uid, role, content, id_bot):
 
 @app.post("/consulta")
 def ask_mia(user: User):
+    connection = connect_to_database()
+    cursor = connection.cursor()
     uid = str(uuid.uuid4())
     user_id = uid if user.id == '' else user.id
     query = f"SELECT content FROM chats WHERE uid = '{user_id}' AND role = 'user' ORDER BY date ASC"
     cursor.execute(query)
-    print("🚀 ~ file: excercise2.py:80 ~ cursor:", cursor)
     res = cursor.fetchall()
-    print("🚀 ~ file: excercise2.py:81 ~ res:", res)
-    for resultado in res:
-        res_for = resultado[0]
-
-    res_content = res_for if user.id != None else ''
+    result = ' '.join(resultado[0] for resultado in res)
+    res_content = f"{result} {user.message}" if user.id is not None else result
+    cursor.close()
+    connection.close()
 
     messages=[
                 {
@@ -91,7 +90,7 @@ def ask_mia(user: User):
                 },
                 {
                     'role':'user',
-                    'content': res_content + ' ' + user.message
+                    'content': res_content
                 }
             ]    
     tools = [
@@ -141,13 +140,12 @@ def ask_mia(user: User):
             model="gpt-3.5-turbo-1106",
             messages=messages,
         )
-        insertBD(user_id, 'user', user.message, 1)
+        insertBD(user_id, 'user', res_content, 1)
         insertBD(user_id, 'assistant', second_response.choices[0].message.content, 1)
-
         return {'id': user_id, 'message':second_response.choices[0].message.content}
 
     else:
-        insertBD(user_id, 'user', user.message, 1)
+        insertBD(user_id, 'user', res_content, 1)
         insertBD(user_id, 'assistant', response_content, 1)
         return {'id': user_id, "message": response_message.content}
 

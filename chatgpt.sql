@@ -1,35 +1,26 @@
-CREATE TABLE bots (
-    b_id INT AUTO_INCREMENT PRIMARY KEY,
-    company VARCHAR(255),
-    system_role TEXT
-);
+SET SQL_MODE = "NO_AUTO_VALUE_ON_ZERO";
+START TRANSACTION;
+SET time_zone = "+00:00";
+
+CREATE TABLE history_chat.bots (
+  b_id int PRIMARY KEY AUTO_INCREMENT,
+  empresa varchar(255) NOT NULL,
+  system text NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 
-CREATE TABLE users (
-    u_id INT AUTO_INCREMENT PRIMARY KEY,
-    uid VARCHAR(255),
-    role VARCHAR(255),
-    content TEXT,
-    date TIMESTAMP,
-    b_id INT,
-    CONSTRAINT FK_b_id FOREIGN KEY (b_id) REFERENCES bots(b_id)
-);
+INSERT INTO history_chat.bots (b_id, empresa, system) VALUES
+(1, 'onbot', 'Eres un agente virtual llamada MIA y tu objetivo es dar la fecha');
 
 
--- Crear la tabla 'bot'
-CREATE TABLE bot (
-    id INT PRIMARY KEY AUTO_INCREMENT,
-    empresa VARCHAR(255) NOT NULL,
-    system VARCHAR(255) NOT NULL
-);
+CREATE TABLE history_chat.chats (
+  c_id int PRIMARY KEY AUTO_INCREMENT,
+  uid varchar(255) NOT NULL,
+  role varchar(10) NOT NULL,
+  content text NOT NULL,
+  date timestamp(3) NOT NULL DEFAULT current_timestamp(3) ON UPDATE current_timestamp(3),
+  id_bot int(11) NOT NULL,
+  FOREIGN KEY (id_bot) REFERENCES history_chat.bots (b_id)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+COMMIT;
 
--- Crear la tabla 'chats'
-CREATE TABLE chats (
-    id INT PRIMARY KEY AUTO_INCREMENT,
-    uid INT NOT NULL,
-    role VARCHAR(255) NOT NULL,
-    content TEXT NOT NULL,
-    date TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    id_bot INT NOT NULL,
-    FOREIGN KEY (id_bot) REFERENCES bot(id)
-);
