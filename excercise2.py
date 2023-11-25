@@ -75,9 +75,9 @@ def ask_mia(user: User):
     cursor = connection.cursor()
     uid = str(uuid.uuid4())
     user_id = uid if user.id == '' else user.id
-    query = f"SELECT content FROM chats WHERE uid = '{user_id}' AND role = 'user' ORDER BY date ASC"
+    query = f"SELECT content FROM chats WHERE uid = '{user_id}' AND role = 'user' ORDER BY date DESC LIMIT 1"
     cursor.execute(query)
-    res = cursor.fetchall()
+    res = cursor.fetchall()    
     result = ' '.join(resultado[0] for resultado in res)
     res_content = f"{result} {user.message}" if user.id is not None else result
     cursor.close()
