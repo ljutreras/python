@@ -173,6 +173,29 @@ def comunicacionOpenAI(user: User):
             }
     
     else:
+
+        conection = conectionDB()
+        if conection:
+
+            cursor = conection.cursor()
+            
+
+            #El id se debera generar solo si no habia un uid de chat anteriormente creado
+
+            queryInsertUser = ("INSERT into chats(uid, role, content, id_bot) VALUES (%s, %s, %s,%s)")
+         
+            queryInsertAssistant = ("INSERT into chats(uid, role, content, id_bot) VALUES (%s, %s, %s,%s)")
+
+            botResponse = response_message.content
+
+            cursor.execute(queryInsertUser,(uidChat,"user",user.message, 1))
+            cursor.execute(queryInsertAssistant,(uidChat,"assistant",botResponse,1))
+
+            conection.commit()
+            cursor.close()
+            conection.close()
+
         return {"uid":uidChat,"message":response_message}
+
 
 
