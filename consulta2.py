@@ -16,6 +16,7 @@ app = FastAPI()
 client = OpenAI(api_key=os.environ['API_KEY'])
 
 def connect_to_database():
+    #asjdasd
     try:
         connection = mysql.connector.connect(
             host='localhost',
