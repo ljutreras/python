@@ -79,7 +79,9 @@ def ask_mia(user: User):
     cursor.execute(query)
     res = cursor.fetchall()
     elementos_pares = [str(tupla[0]) for i, tupla in enumerate(res) if i % 2 == 0]
+    print("🚀 ~ file: excercise2.py:82 ~ elementos_pares:", elementos_pares)
     elementos_impares = [str(tupla[0]) for i, tupla in enumerate(res) if i % 2 != 0]
+    print("🚀 ~ file: excercise2.py:84 ~ elementos_impares:", elementos_impares)
     # result = ' '.join(resultado[0] for resultado in res)
     # res_content = f"{result} {user.message}" if user.id is not None else result
     cursor.close()
@@ -90,25 +92,18 @@ def ask_mia(user: User):
                     'role': 'system',
                     'content':'Eres una agente virtual llamada MIA y tu objetivo es decir la fecha'
                 },
-                # {
-                #     'role': 'user',
-                #     'content': user.message
-                # },
-                # {
-                #     'role':'assistant',
-                #     'content': ''
-                # }
+                {
+                    'role': 'user',
+                    'content': user.message
+                },
+                {
+                    'role': 'assistant',
+                    'content': ''
+                }
             ]
-    messages.append({
-    'role': 'user',
-    'content': ' '.join(elementos_pares)
-    })
+    
 
-    messages.append({
-        'role': 'assistant',
-        'content': ' '.join(elementos_impares)
-    })  
-    print("🚀 ~ file: excercise2.py:89 ~ messages:", messages)
+    # Agregar elementos impares como objetos individuales a la lista messages
     tools = [
         {
             "type": "function",
@@ -156,11 +151,33 @@ def ask_mia(user: User):
             model="gpt-3.5-turbo-1106",
             messages=messages,
         )
+        messages.append({
+            'role': 'user',
+            'content': elementos_pares
+        })
+
+        messages.append({
+            'role': 'assistant',
+            'content': second_response.choices[0].message.content
+        })
+
+        print(messages)
         insertBD(user_id, 'user', user.message, 1)
         insertBD(user_id, 'assistant', second_response.choices[0].message.content, 1)
         return {'id': user_id, 'message':second_response.choices[0].message.content}
 
     else:
+        messages.append({
+            'role': 'user',
+            'content': elementos_pares
+        })
+
+        messages.append({
+            'role': 'assistant',
+            'content': elementos_impares
+        })
+
+        print(messages)
         insertBD(user_id, 'user', user.message, 1)
         insertBD(user_id, 'assistant', response_content, 1)
         return {'id': user_id, "message": response_message.content}
