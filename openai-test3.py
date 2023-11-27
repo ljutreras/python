@@ -193,7 +193,7 @@ def comunicacionOpenAI(user: User):
             queryInsertAssistant = ("INSERT into chats(uid, role, content, id_bot) VALUES (%s, %s, %s,%s)")
 
             botResponse = response_message.content
-
+            
             cursor.execute(queryInsertUser,(uidChat,"user",user.message, 1))
             cursor.execute(queryInsertAssistant,(uidChat,"assistant",botResponse,1))
 
