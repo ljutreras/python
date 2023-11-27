@@ -75,11 +75,13 @@ def ask_mia(user: User):
     cursor = connection.cursor()
     uid = str(uuid.uuid4())
     user_id = uid if user.id == '' else user.id
-    query = f"SELECT content FROM chats WHERE uid = '{user_id}' AND role = 'user' ORDER BY date DESC LIMIT 1"
+    query = f"SELECT content FROM chats WHERE uid = '{user_id}' ORDER BY date ASC"
     cursor.execute(query)
-    res = cursor.fetchall()    
-    result = ' '.join(resultado[0] for resultado in res)
-    res_content = f"{result} {user.message}" if user.id is not None else result
+    res = cursor.fetchall()
+    elementos_pares = [str(tupla[0]) for i, tupla in enumerate(res) if i % 2 == 0]
+    elementos_impares = [str(tupla[0]) for i, tupla in enumerate(res) if i % 2 != 0]
+    # result = ' '.join(resultado[0] for resultado in res)
+    # res_content = f"{result} {user.message}" if user.id is not None else result
     cursor.close()
     connection.close()
 
@@ -88,11 +90,25 @@ def ask_mia(user: User):
                     'role': 'system',
                     'content':'Eres una agente virtual llamada MIA y tu objetivo es decir la fecha'
                 },
-                {
-                    'role':'user',
-                    'content': res_content
-                }
-            ]    
+                # {
+                #     'role': 'user',
+                #     'content': user.message
+                # },
+                # {
+                #     'role':'assistant',
+                #     'content': ''
+                # }
+            ]
+    messages.append({
+    'role': 'user',
+    'content': ' '.join(elementos_pares)
+    })
+
+    messages.append({
+        'role': 'assistant',
+        'content': ' '.join(elementos_impares)
+    })  
+    print("🚀 ~ file: excercise2.py:89 ~ messages:", messages)
     tools = [
         {
             "type": "function",
@@ -140,12 +156,12 @@ def ask_mia(user: User):
             model="gpt-3.5-turbo-1106",
             messages=messages,
         )
-        insertBD(user_id, 'user', res_content, 1)
+        insertBD(user_id, 'user', user.message, 1)
         insertBD(user_id, 'assistant', second_response.choices[0].message.content, 1)
         return {'id': user_id, 'message':second_response.choices[0].message.content}
 
     else:
-        insertBD(user_id, 'user', res_content, 1)
+        insertBD(user_id, 'user', user.message, 1)
         insertBD(user_id, 'assistant', response_content, 1)
         return {'id': user_id, "message": response_message.content}
 
