@@ -147,12 +147,12 @@ def ask_mia(request: UserRequest):
         if conection:
             cursor = conection.cursor()
 
-            queryInsertUser = ("INSERT into chats(uid, role, content, id_bot) VALUES(%s, %s, %s, %s)")
-            queryInsertAssistant = ("INSERT into chats(uid, role, content, id_bot) VALUES(%s, %s, %s, %s)")
+            queryInsertUser = ("INSERT into chats(uid, role, content, function_calling, id_bot) VALUES(%s, %s, %s, %s)")
+            queryInsertAssistant = ("INSERT into chats(uid, role, content, function_calling, id_bot) VALUES(%s, %s, %s, %s)")
 
             botResponse = second_response.choices[0].message.content
 
-            cursor.execute(queryInsertUser, (uidChat, "user", request.user_message, 1))
+            cursor.execute(queryInsertUser, (uidChat, "user", request.user_message, "none", 1))
             cursor.execute(queryInsertAssistant, (uidChat, "assistant", botResponse, 1))
 
             conection.commit()
