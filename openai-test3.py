@@ -85,7 +85,7 @@ def comunicacionOpenAI(user: User):
         for role, content in record:
             dictionary = {"role":role,"content":content}
             messages.append(dictionary)
-
+        messages.append({"role": "user", "content": user.message})
         print(messages)
 
     #En este caso se considera como si NO se ingreso un uid en el body de postman por ende, se determina que el primer diccionario o comando que se le otorgara a "messages" sera un "role": "system" ademas del primer mensaje que usuario va a enviar en su conversacion
@@ -173,6 +173,6 @@ def comunicacionOpenAI(user: User):
             }
     
     else:
-        return response
+        return {"uid":uidChat,"message":response_message}
 
 
