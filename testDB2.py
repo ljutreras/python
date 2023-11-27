@@ -56,7 +56,7 @@ dictionary = {}
 voidTuple = []
 
 contentChatsByUid = f"SELECT content FROM chats where uid = '27d115067cd7402a9a32070c47eb75dd' order by date asc"
-roleChatsByUid= f"SELECT role, content FROM chats where uid = '27d115067cd7402a9a32070c47eb75dd' order by date asc"
+roleChatsByUid= f"SELECT role, content,function_calling FROM chats order by date asc"
 
 cursorFindRole.execute(roleChatsByUid)
 
@@ -68,9 +68,9 @@ cursorFindRole.execute(roleChatsByUid)
 recordRole = cursorFindRole.fetchall()
 
 
-for role, content in recordRole:
+for role, content,function_calling in recordRole:
     
-    dictionary = {"role":role,"content":content}
+    dictionary = {"role":role,"content":content,"function_calling":function_calling}
 
     voidTuple.append(dictionary)
 

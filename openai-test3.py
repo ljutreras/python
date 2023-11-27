@@ -153,14 +153,14 @@ def comunicacionOpenAI(user: User):
 
             #El id se debera generar solo si no habia un uid de chat anteriormente creado
 
-            queryInsertUser = ("INSERT into chats(uid, role, content, id_bot) VALUES (%s, %s, %s,%s)")
+            queryInsertUser = ("INSERT into chats(uid, role, content,function_calling, id_bot) VALUES (%s, %s, %s,%s,%s)")
          
-            queryInsertAssistant = ("INSERT into chats(uid, role, content, id_bot) VALUES (%s, %s, %s,%s)")
+            queryInsertAssistant = ("INSERT into chats(uid, role, content,function_calling, id_bot) VALUES (%s, %s, %s,%s,%s)")
 
             botResponse = second_response.choices[0].message.content
 
-            cursor.execute(queryInsertUser,(uidChat,"user",user.message, 1))
-            cursor.execute(queryInsertAssistant,(uidChat,"assistant",botResponse,1))
+            cursor.execute(queryInsertUser,(uidChat,"user",user.message,function_name, 1))
+            cursor.execute(queryInsertAssistant,(uidChat,"assistant",botResponse,function_name,1))
 
             conection.commit()
             cursor.close()
@@ -169,7 +169,8 @@ def comunicacionOpenAI(user: User):
 
         return {
             "uid":uidChat,
-            "message":second_response.choices[0].message
+            "message":second_response.choices[0].message,
+            "function": function_name
             }
     
     else:
@@ -179,6 +180,11 @@ def comunicacionOpenAI(user: User):
 
             cursor = conection.cursor()
             
+            #aqui estamos obteniendo el nombre de la funcion que se llamo en el caso de que no le hayamos ingresado un "uid" al body de postman, y se lo estamos entregando a la variable "function_name"
+            
+            function_name = response_message.tool_calls
+            
+
 
             #El id se debera generar solo si no habia un uid de chat anteriormente creado
 
@@ -195,7 +201,7 @@ def comunicacionOpenAI(user: User):
             cursor.close()
             conection.close()
 
-        return {"uid":uidChat,"message":response_message}
+        return {"uid":uidChat,"message":response_message,"functionList":function_name}
 
 
 
