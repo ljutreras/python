@@ -17,7 +17,7 @@ openai.api_key=os.getenv('API_KEY')
 class User(BaseModel):
     id: Optional[str] = ''
     message: str
-    
+
 
 
 def connect_to_database():
@@ -47,7 +47,7 @@ def web_fecha():
         return fecha
     else:
         return "Error al obtener la fecha"
-    
+
 
 def get_current_date():
     fecha_actual = web_fecha()
@@ -64,13 +64,15 @@ def insertBD(uid, role, content, id_bot):
         elif role == 'assistant':
             insert_query = "INSERT INTO chats(uid, role, content, date, id_bot) VALUES(%s, %s, %s, DATE_ADD(NOW(), INTERVAL 1 SECOND), %s)"
             cursor.execute(insert_query, (uid, role, content, id_bot))
-        
+
         connection.commit()
         cursor.close()
         connection.close()
 
+
 @app.post("/consulta")
 def ask_mia(user: User):
+    res = []
     connection = connect_to_database()
     cursor = connection.cursor()
     uid = str(uuid.uuid4())
@@ -78,14 +80,16 @@ def ask_mia(user: User):
     query = f"SELECT content FROM chats WHERE uid = '{user_id}' ORDER BY date ASC"
     cursor.execute(query)
     res = cursor.fetchall()
-    elementos_pares = [str(tupla[0]) for i, tupla in enumerate(res) if i % 2 == 0]
-    print("🚀 ~ file: excercise2.py:82 ~ elementos_pares:", elementos_pares)
-    elementos_impares = [str(tupla[0]) for i, tupla in enumerate(res) if i % 2 != 0]
-    print("🚀 ~ file: excercise2.py:84 ~ elementos_impares:", elementos_impares)
-    # result = ' '.join(resultado[0] for resultado in res)
-    # res_content = f"{result} {user.message}" if user.id is not None else result
+    # elementos_pares = [str(tupla[0]) for i, tupla in enumerate(res) if i % 2 == 0]
+    # print("🚀 ~ file: excercise2.py:82 ~ elementos_pares:", elementos_pares)
+    # elementos_impares = [str(tupla[0]) for i, tupla in enumerate(res) if i % 2 != 0]
+    # print("🚀 ~ file: excercise2.py:84 ~ elementos_impares:", elementos_impares)
+    # # result = ' '.join(resultado[0] for resultado in res)
+    # # res_content = f"{result} {user.message}" if user.id is not None else result
     cursor.close()
     connection.close()
+
+
 
     messages=[
                 {
@@ -94,14 +98,13 @@ def ask_mia(user: User):
                 },
                 {
                     'role': 'user',
-                    'content': user.message
+                    'content':user.message
                 },
                 {
                     'role': 'assistant',
-                    'content': ''
+                    'content':''
                 }
             ]
-    
 
     # Agregar elementos impares como objetos individuales a la lista messages
     tools = [
@@ -123,9 +126,18 @@ def ask_mia(user: User):
         tools=tools,
         tool_choice="auto",
     )
+    
+    for i, valor in enumerate(res):
+            role = 'user' if i % 2 == 0 else 'assistant'
+            content = str(valor[0]) if isinstance(valor, tuple) else str(valor)
+
+            messages.append({
+                'role': role,
+                'content': content
+            })
 
     response_content = response.choices[0].message.content if response.choices else ""
-   
+
 
     response_message = response.choices[0].message
     tool_calls = response_message.tool_calls
@@ -151,35 +163,18 @@ def ask_mia(user: User):
             model="gpt-3.5-turbo-1106",
             messages=messages,
         )
-        messages.append({
-            'role': 'user',
-            'content': elementos_pares
-        })
-
-        messages.append({
-            'role': 'assistant',
-            'content': second_response.choices[0].message.content
-        })
-
-        print(messages)
+        
         insertBD(user_id, 'user', user.message, 1)
         insertBD(user_id, 'assistant', second_response.choices[0].message.content, 1)
+        print(messages)
+
         return {'id': user_id, 'message':second_response.choices[0].message.content}
 
     else:
-        messages.append({
-            'role': 'user',
-            'content': elementos_pares
-        })
-
-        messages.append({
-            'role': 'assistant',
-            'content': elementos_impares
-        })
-
-        print(messages)
+        
         insertBD(user_id, 'user', user.message, 1)
         insertBD(user_id, 'assistant', response_content, 1)
+        print(messages)
         return {'id': user_id, "message": response_message.content}
 
 if __name__ == "__main__":
