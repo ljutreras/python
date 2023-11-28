@@ -201,6 +201,8 @@ def comunicacionOpenAI(user: User):
             cursor.close()
             conection.close()
 
+            #asdadasda
+
         return {"uid":uidChat,"message":response_message,"functionList":function_name}
 
 
