@@ -41,3 +41,35 @@ def prompt2 ():
     response = get_completion_from_messages(messages, temperature=1)
     print(response)
 
+def prompt3 ():
+    
+    messages =  [  
+    {'role':'system', 'content':'You are friendly chatbot.'},    
+    {'role':'user', 'content':'Yes,  can you remind me, What is my name?'}  ]
+    response = get_completion_from_messages(messages, temperature=1)
+    print(response)
+
+
+def prompt4 ():
+    
+    messages =  [  
+    {'role':'system', 'content':'You are friendly chatbot.'},    
+    {'role':'user', 'content':'Yes,  can you remind me, What is my name?'}  ]
+    response = get_completion_from_messages(messages, temperature=1)
+    print(response)
+
+def prompt5 ():
+    
+    messages =  [  
+    {'role':'system', 'content':'You are friendly chatbot.'},
+    {'role':'user', 'content':'Hi, my name is Isa'},
+    {'role':'assistant', 'content': "Hi Isa! It's nice to meet you. \
+    Is there anything I can help you with today?"},
+    {'role':'user', 'content':'Yes, you can remind me, What is my name?'}  ]
+    response = get_completion_from_messages(messages, temperature=1)
+    print(response)
+
+
+#OrderBot
+#We can automate the collection of user prompts and assistant responses to build a OrderBot. The OrderBot will take orders at a pizza restaurant.
+
