@@ -102,7 +102,7 @@ def ask_mia(user: User):
     messages=[
                 {
                     'role': 'system',
-                    'content':'Eres una agente virtual llamada MIA y tu objetivo es decir la fecha y nombrar los poemones existentes'
+                    'content':'Eres una agente virtual llamada MIA y tu objetivo es decir la fecha y nombrar los pokemones existentes'
                 },
                 {
                     'role': 'user',
@@ -182,14 +182,14 @@ def ask_mia(user: User):
             model="gpt-3.5-turbo-1106",
             messages=messages,
         )
-        print(function_name)
+        print(messages)
         insertBD(user_id, 'user', user.message,None , 1)
         insertBD(user_id, 'assistant', second_response.choices[0].message.content,function_name, 1)
 
         return {'id': user_id, 'message':second_response.choices[0].message.content}
 
     else:
-        
+        print(messages)
         insertBD(user_id, 'user', user.message,None, 1)
         insertBD(user_id, 'assistant', response_content,None, 1)
         return {'id': user_id, "message": response_message.content}
