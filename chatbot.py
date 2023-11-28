@@ -73,3 +73,16 @@ def prompt5 ():
 #OrderBot
 #We can automate the collection of user prompts and assistant responses to build a OrderBot. The OrderBot will take orders at a pizza restaurant.
 
+def chatBot():
+    prompt = ""
+    message = []
+    while prompt != "exit":
+        prompt = input("Usuario: ")
+        
+        message.append({"role":"user","content":prompt})
+        response = get_completion_from_messages(message)
+        message.append({"role":"assistant","content":response})
+        print("assistant:"+ response)
+        
+chatBot()
+    
