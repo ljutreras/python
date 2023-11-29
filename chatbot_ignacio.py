@@ -192,7 +192,7 @@ while clientInput != "exit":
         #Se vuelve a solicitar un input para ver si el cliente tiene alguna otra consulta o quiere terminar el chat ingresando "exit"
         clientInput = input("\nCliente: ").lower()
 
-
+    #Se entra en este else en el caso de que lo que haya ingresado el usuario no haga que sea utilizada algunas de las funciones establecidas
     else:
 
         #Mensaje predeterminado establecido, que sera utilizado en caso de que el cliente no ingrese algun input que accione el uso de las funciones disponibles
