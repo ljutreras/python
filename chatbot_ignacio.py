@@ -72,14 +72,61 @@ client = OpenAI()
 messages = []
 
 def detalleDeuda():
-    return ""
-def solicitarRecibo():
-    return ""
+    """Obtener el detalle de la deuda vencida"""
+
+    nombre = "Ignacio"
+    servicio = "movil"
+    nro_servicio = ""
+    fecha = "dd/mm"
+    monto_deuda = str(100)
+
+    return json.dumps({"nombre": nombre},{"servicio": servicio},{"numero servicio": nro_servicio},{"fecha": fecha},{"monto deuda": monto_deuda})
+
 def formasYLugaresDePago():
-    return ""
+    """Obtener las formas y lugares de pago"""
+
+    return json.dumps({"pagina web para pagar": "https://innovacxion.page.link/mVFa"},{"canal de pago":"https://www.movistar.com.pe/atencion-al-cliente/lugares-y-medios-de-pago"})
+
+def solicitarRecibo():
+    """Obtener el recibo"""
+    
+
+    return json.dumps({"": ""})
 
 tools = [
-        {"type": "function","function": {"name": "get_current_date","description": "Get the current date from a specific web page","parameters": {"type": "object","properties": {}}},}]
+        {
+            "type": "function",
+            "function": {
+                "name": "detalleDeuda",
+                "description": "Obtener el detalle de la deuda vencida",
+                "parameters": {
+                    "type": "object",
+                    "properties": {}
+                }
+            },
+        },
+        {
+            "type": "function",
+            "function": {
+                "name": "formasYLugaresDePago",
+                "description": "Obtener las formas y lugares de pago",
+                "parameters": {
+                    "type": "object",
+                    "properties": {}
+                }
+            },
+        },
+        {
+            "type": "function",
+            "function": {
+                "name": "solicitarRecibo",
+                "description": "Obtener el recibo",
+                "parameters": {
+                    "type": "object",
+                    "properties": {}
+                }
+            },
+        }]
 
 response = client.chat.completions.create(
     model="gpt-3.5-turbo-1106",
