@@ -119,6 +119,8 @@ if clientInput:
 
     while loginAttepmts < 2:
             
+            loginAttepmts += 1
+            
             if clientDataInput == "20252598":
                 print("\n\nBienvenido Ignacio\n\n")
 
@@ -243,9 +245,12 @@ if clientInput:
 
             #else donde se contaran el numero de intentos que lleva el cliente para iniciar sesion
             else:
-                loginAttepmts += 1
-                print("\nNo fue posible validar tu identidad.\nPor favor intenta nuevamente.")
-                clientDataInput = input("\nCliente: ").lower()
+                if loginAttepmts < 3:
+                     print("\nNo fue posible validar tu identidad.\nPor favor intenta nuevamente.")
+                     clientDataInput = input("\nCliente: ").lower()
+                
+
+            
 
 
 
