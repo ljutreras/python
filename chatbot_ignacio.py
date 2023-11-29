@@ -107,113 +107,146 @@ print("\n        ¡Hola! Bienvendi@ al chat de Movistar!\n\nEstoy para ayudarte 
 #Input inicial antes de entrar al ciclo while
 clientInput = input("Cliente: ").lower()
 
-while clientInput != "exit":
+#If que consulta si el cliente respondio la primera vez que se espero una respuesta de él
+if clientInput:
 
-    #Aqui se agrega a la lista messages el input inicial que ingreso el cliente
-    messages.append({"role":"user","content":clientInput})
+    #A continuacion se le indica al cliente que se necesitan datos adicionales para seguir con su consulta, estos datos ingresados seran almacenados en una variable "clientDataInput"
+    print("\n\n Necesito que me des algunos datos para continuar con tu consulta. Por favor, ingresa el documento de identidad del titular del servicio.")
+    clientDataInput = input("\nCliente: ").lower()
 
-    response = client.chat.completions.create(
-    model="gpt-3.5-turbo-1106",
-    messages= messages,
-    tools=tools,
-    tool_choice="auto")
+    #Variable que almacenará el numero de veces que el cliente intenta iniciar sesion con los datos que ingresó
+    loginAttepmts = 0
 
-    #Respuesta que nos retorna la IA
-    response_message = response.choices[0].message
+    while loginAttepmts < 2:
+            
+            if clientDataInput == "20252598":
+                print("\n\nBienvenido Ignacio\n\n")
 
-    #PRINTS PARA VER LO QUE NOS RETONRA RESPONSE_MESSAGE###
-    """ print("")
-    print("RESPONSE MESSAGE:")
-    print(response_message)
-    print("") """
-    #######################################################
+                
+                while clientInput != "exit":
 
-    #Variable(tool_calls) que almacenará la lista de diccionarios de la informacion de la funcion que la AI utilizó
-    tool_calls = response_message.tool_calls
+                    #Aqui se agrega a la lista messages el input inicial que ingreso el cliente
+                    messages.append({"role":"user","content":clientInput})
 
-    #Se consulta si se utilizo alguna tool
-    if tool_calls:
-  
-        #Diccionario que almacenará los los nombres de las funciones disponibles
-        available_functions = {
-        
-        "detalleDeuda": detalleDeuda,
-        "formasYLugaresDePago": formasYLugaresDePago,
-        "solicitarRecibo": solicitarRecibo,
-        
-        }
+                    
+                    response = client.chat.completions.create(
+                    model="gpt-3.5-turbo-1106",
+                    messages= messages,
+                    tools=tools,
+                    tool_choice="auto")
 
-        #Se agrega el mensaje que respondio la IA a la lista messages
-        messages.append(response_message)
+                    #Respuesta que nos retorna la IA
+                    response_message = response.choices[0].message
 
-        # A continuacion se aprecia un ciclo for para recorrer todas las funciones que fueron utilizadas por medio de tools, en cada ciclo se agregaran los datos de "name" y "content" a las variables function_name("El nombre de la funncion se utilizó") y function_response(el contenido que retorno la funcion utilizada, para encontrar estos contenidos dirigirse a los "returns" de cada funcion).
+                    #PRINTS PARA VER LO QUE NOS RETONRA RESPONSE_MESSAGE###
+                    """ print("")
+                    print("RESPONSE MESSAGE:")
+                    print(response_message)
+                    print("") """
+                    #######################################################
 
-        #Finalmente se agrega a la lista messages un diccionario con las claves "tool_call_id"(id generado al llamar a la funcion),"role"(hardcoded a "tool"), "name"(el nombre de la funcion que se utilizó) y "content"(Contenido que retorno la funcion utilizada)
-        for tool_call in tool_calls:
-             
-            function_name = tool_call.function.name
-            function_to_call = available_functions[function_name]
-            function_response = function_to_call(
-            )
-            messages.append({
-                 
-                "tool_call_id": tool_call.id,
-                "role": "tool",
-                "name": function_name,
-                "content": function_response
+                    #Variable(tool_calls) que almacenará la lista de diccionarios de la informacion de la funcion que la AI utilizó
+                    tool_calls = response_message.tool_calls
 
-                 })
+                    #
+                    #Se consulta si se utilizo alguna tool
+                    if tool_calls:
+                
+                        #Diccionario que almacenará los los nombres de las funciones disponibles
+                        available_functions = {
+                        
+                        "detalleDeuda": detalleDeuda,
+                        "formasYLugaresDePago": formasYLugaresDePago,
+                        "solicitarRecibo": solicitarRecibo,
+                        
+                        }
 
+                        #Se agrega el mensaje que respondio la IA a la lista messages
+                        messages.append(response_message)
 
-        #Se obtiene la respuesta final de openai en formato string, esto porque accedemos a message.content, luego se agrega a la lista de diccionarios, messages, el chatMovistarMessage que vendria siendo la respuesta final de openai
-        
-        #Variable que contiene un string vacio
-        chatMovistarMessage = ""
+                        # A continuacion se aprecia un ciclo for para recorrer todas las funciones que fueron utilizadas por medio de tools, en cada ciclo se agregaran los datos de "name" y "content" a las variables function_name("El nombre de la funncion se utilizó") y function_response(el contenido que retorno la funcion utilizada, para encontrar estos contenidos dirigirse a los "returns" de cada funcion).
 
-        #Diccionario que recibe un string proveniente de function_response (que vendria siendo el contenido que retorna la funcion al ser utilizada), y luego cambia su tipo de dato a diccionario con la fucnion "eval()"
-        dictionary = eval(function_response)
-        
-        #El siguiente ciclo for recorre el diccionario "dictionary" obteniendo solo sus claves mediantes la funcion "values()" para luego asignarlos a la variable "content" en cada ciclo, a su vez dentro de cada ciclo realizado se cambia el tipo de dato de "content" mediante la clase "str()" para luego agregarlo al string "chatMovistarMessage" (los string que se vayan agregando estaran separados por un espacio vacio)
-        for content in dictionary.values():
-            chatMovistarMessage += str(content)
+                        #Finalmente se agrega a la lista messages un diccionario con las claves "tool_call_id"(id generado al llamar a la funcion),"role"(hardcoded a "tool"), "name"(el nombre de la funcion que se utilizó) y "content"(Contenido que retorno la funcion utilizada)
+                        for tool_call in tool_calls:
+                            
+                            function_name = tool_call.function.name
+                            function_to_call = available_functions[function_name]
+                            function_response = function_to_call(
+                            )
+                            messages.append({
+                                
+                                "tool_call_id": tool_call.id,
+                                "role": "tool",
+                                "name": function_name,
+                                "content": function_response
 
-        #Se agrega a la lista messages la variable "chatMovistarMessage" con role "assistant" ya que se considera que esta es la respuesta que entrego la IA
-        messages.append({"role":"assistant","content":chatMovistarMessage})
-
-        #PRINTS PARA VER LA LISTA HISTORICA DE LOS MENSAJES DEL CHAT#####
-
-        """ print("Lista historica de mensajes del chat:")
-        print(messages)
-        print("") """
-        
-        ##################################################################
-        print("\nChat Movistar: " + chatMovistarMessage)
-
-        #Se vuelve a solicitar un input para ver si el cliente tiene alguna otra consulta o quiere terminar el chat ingresando "exit"
-        clientInput = input("\nCliente: ").lower()
-
-    #Se entra en este else en el caso de que lo que haya ingresado el usuario no haga que sea utilizada algunas de las funciones establecidas
-    else:
-
-        #Mensaje predeterminado establecido, que sera utilizado en caso de que el cliente no ingrese algun input que accione el uso de las funciones disponibles
-        chatPorDesviacionDeTema = "Lo siento, Solo puedo responder a una de las 3 siguientes solicitudes:\n\n• Detalle de la deuda\n• Solicitar recibo\n• Formas y lugares de pago"
-
-        #Se agrega este mensaje predeterminado a la lista "messages" ya que se considera como la respuesta de la IA
-        messages.append({"role":"assistant","content":chatPorDesviacionDeTema})
-
-        #PRINTS PARA VER LA LISTA HISTORICA DE LOS MENSAJES DEL CHAT#####
-
-        """ print("Lista historica de mensajes del chat:")
-        print(messages)
-        print("") """
-
-        ##################################################################
-        
-        #Se imprime el mensaje predeterminado para indicarle al cliente que debe ingresar una solicitud que sea valida segun los casos de uso
-        print("\nChat Movistar: " + chatPorDesviacionDeTema)
+                                })
 
 
-        #Se vuelve a solicitar un input para ver si el cliente tiene alguna otra consulta o quiere terminar el chat ingresando "exit"
-        clientInput = input("\nCliente: ").lower()
+                        #Se obtiene la respuesta final de openai en formato string, esto porque accedemos a message.content, luego se agrega a la lista de diccionarios, messages, el chatMovistarMessage que vendria siendo la respuesta final de openai
+                        
+                        #Variable que contiene un string vacio
+                        chatMovistarMessage = ""
+
+                        #Diccionario que recibe un string proveniente de function_response (que vendria siendo el contenido que retorna la funcion al ser utilizada), y luego cambia su tipo de dato a diccionario con la fucnion "eval()"
+                        dictionary = eval(function_response)
+                        
+                        #El siguiente ciclo for recorre el diccionario "dictionary" obteniendo solo sus claves mediantes la funcion "values()" para luego asignarlos a la variable "content" en cada ciclo, a su vez dentro de cada ciclo realizado se cambia el tipo de dato de "content" mediante la clase "str()" para luego agregarlo al string "chatMovistarMessage" (los string que se vayan agregando estaran separados por un espacio vacio)
+                        for content in dictionary.values():
+                            chatMovistarMessage += str(content)
+
+                        #Se agrega a la lista messages la variable "chatMovistarMessage" con role "assistant" ya que se considera que esta es la respuesta que entrego la IA
+                        messages.append({"role":"assistant","content":chatMovistarMessage})
+
+                        #PRINTS PARA VER LA LISTA HISTORICA DE LOS MENSAJES DEL CHAT#####
+
+                        """ print("Lista historica de mensajes del chat:")
+                        print(messages)
+                        print("") """
+                        
+                        ##################################################################
+                        print("\nChat Movistar: " + chatMovistarMessage)
+
+                        #Se vuelve a solicitar un input para ver si el cliente tiene alguna otra consulta o quiere terminar el chat ingresando "exit"
+                        clientInput = input("\nCliente: ").lower()
+
+                        
+
+                    #
+                    #Se entra en este else en el caso de que lo que haya ingresado el usuario no haga que sea utilizada algunas de las funciones establecidas
+                    else:
+
+                        #Mensaje predeterminado establecido, que sera utilizado en caso de que el cliente no ingrese algun input que accione el uso de las funciones disponibles
+                        chatPorDesviacionDeTema = "Lo siento, Solo puedo responder a una de las 3 siguientes solicitudes:\n\n• Detalle de la deuda\n• Solicitar recibo\n• Formas y lugares de pago"
+
+                        #Se agrega este mensaje predeterminado a la lista "messages" ya que se considera como la respuesta de la IA
+                        messages.append({"role":"assistant","content":chatPorDesviacionDeTema})
+
+                        #PRINTS PARA VER LA LISTA HISTORICA DE LOS MENSAJES DEL CHAT#####
+
+                        """ print("Lista historica de mensajes del chat:")
+                        print(messages)
+                        print("") """
+
+                        ##################################################################
+                        
+                        #Se imprime el mensaje predeterminado para indicarle al cliente que debe ingresar una solicitud que sea valida segun los casos de uso
+                        print("\nChat Movistar: " + chatPorDesviacionDeTema)
+
+
+                        #Se vuelve a solicitar un input para ver si el cliente tiene alguna otra consulta o quiere terminar el chat ingresando "exit"
+                        clientInput = input("\nCliente: ").lower()
+
+                    #if que en el caso de que el cliente escriba "exit" se le asignara el numero "3" a la variable loginAttempts para salir del while que consulta si el usuario ya supero el numero de intentos para iniciar sesion
+                    if clientInput == "exit":
+                            loginAttepmts = 3
+
+            #else donde se contaran el numero de intentos que lleva el cliente para iniciar sesion
+            else:
+                loginAttepmts += 1
+                print("\nNo fue posible validar tu identidad.\nPor favor intenta nuevamente.")
+                clientDataInput = input("\nCliente: ").lower()
+
+
 
 #######################################################################################################################################
