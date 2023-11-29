@@ -102,7 +102,7 @@ role": "system", "content": "Eres un asistente virtual llamado chat Movistar y t
 
 
 #MENSAJE INICIAL
-print("\n        ¡Hola! Bienvendi@ al chat de Movistar!\n\nEstoy para ayudarte en:\n•Conocer detalle de tu deuda vencida\n•Formas y lugares de pago\n•Solicitar recibo\n\n        Comentanos,¿qué necesitas?\n")
+print("\n        ¡Hola! Bienvendi@ al chat de Movistar!\n\nEstoy para ayudarte en:\n • Conocer detalle de tu deuda vencida\n • Formas y lugares de pago\n • Solicitar recibo\n\n        Comentanos,¿qué necesitas?\n")
 
 #Input inicial antes de entrar al ciclo while
 clientInput = input("Cliente: ").lower()
