@@ -52,6 +52,15 @@ def get_receipt():
     
     return json.dumps({"mensaje predeterminado":default_message,"url del recibo": b2c})
 
+def get_goodbye():
+
+    """Obtener despedida
+
+    Returns:
+        json: Mensaje que retorna una despedida al cliente cuando se siente satisfecho
+    """    
+
+    return json.dumps({"mensaje de despedida":"Gracias por elegir movistar, que tenga un buen dia :)"})
 
 tools = [
         {
@@ -86,10 +95,21 @@ tools = [
                     "properties": {}
                 }
             },
+        },
+        {
+            "type": "function",
+            "function": {
+                "name": "get_goodbye",
+                "description": "Reconocer si el usuario ya está satisfecho, no quiere seguir la conversación, no quiere seguir hablando o te agradece",
+                "parameters": {
+                    "type": "object",
+                    "properties": {}
+                }
+            },
         }]
 
 #Primer mensaje de rol system para indicar el comportamiento y logica que debera emplear la AI
-messages = [{"role": "system", "content": "Eres un asistente virtual llamado chat Movistar, posees cuatro funciones: get_debt_detail, get_payment_methods_and_locations, get_receipt. Tu objetivo es determinar cual funcion utilizar para responderle al cliente, los temas que puedes responder para utilizar las funciones son: Detalle de la deuda, Solicitar recibo, Formas y lugares de pago."}]
+messages = [{"role": "system", "content": "Eres un asistente virtual llamado chat Movistar, posees las siguientes funciones: get_debt_detail, get_payment_methods_and_locations, get_receipt, get_goodbye. Tu objetivo es determinar cual funcion utilizar para responderle al cliente, los temas que puedes responder para utilizar las funciones son: Detalle de la deuda, Solicitar recibo, Formas y lugares de pago."}]
 
 #Mensaje inicial al ejecutar el codigo
 print("\n        ¡Hola! Bienvendi@ al chat de Movistar!\n\nEstoy para ayudarte en:\n • Conocer detalle de tu deuda vencida\n • Formas y lugares de pago\n • Solicitar recibo\n\n        Comentanos,¿qué necesitas?\n")
@@ -139,6 +159,7 @@ if client_input:
                         "get_debt_detail": get_debt_detail,
                         "get_payment_methods_and_locations": get_payment_methods_and_locations,
                         "get_receipt": get_receipt,
+                        "get_goodbye": get_goodbye
                         
                         }
 
@@ -169,6 +190,9 @@ if client_input:
                         messages.append({"role":"assistant","content":movistar_chat_message})
 
                         print("\nChat Movistar:\n" + movistar_chat_message)
+
+                        if movistar_chat_message == "Gracias por elegir movistar, que tenga un buen dia :)":
+                            exit()
 
                         client_input = input("\nCliente: ").lower()
 
