@@ -43,8 +43,8 @@ def detalleDeuda():
 def formasYLugaresDePago():
     """Obtener las formas y lugares de pago"""
 
-    firstParagraph = "En Movistar te brindamos diversas formas de pago SIN COMISIÓN. Puedes para por Yape: "
-    secondParagraph = ", desde la web o app de tu banco. Conoce todos los canales de pago en el siguiente link: "
+    firstParagraph = "En Movistar te brindamos diversas formas de pago SIN COMISIÓN.\nPuedes pagar por Yape: "
+    secondParagraph = ", desde la web o app de tu banco.\nConoce todos los canales de pago en el siguiente link: "
 
     return json.dumps({"primer parrafo":firstParagraph,"pagina web para pagar": "https://innovacxion.page.link/mVFa","segundo parrafo":secondParagraph,"canal de pago":"https://www.movistar.com.pe/atencion-al-cliente/lugares-y-medios-de-pago"})
 
