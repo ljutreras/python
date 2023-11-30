@@ -8,7 +8,8 @@ def despedida(message):
             <FORMAS Y LUGARES DE PAGO>
             <SOLICITUD DE RECIBO>
             \"\"\" \
-            el campo <DETALLE DE LA DEUDA> <FORMAS Y LUGARES DE PAGO> y <SOLICITUD DE RECIBO> serán proporcionado por la asistente de haber sido solicitados previamente\
+            el campo <DETALLE DE LA DEUDA> <FORMAS Y LUGARES DE PAGO> y <SOLICITUD DE RECIBO> serán proporcionado por la asistentesiempre y cuando hayan sido solicitados previamente\
+            de lo contrario el campo quedará vacio \
             la informacion obtenida será delimitada por triples comillas invertidas.\
 
             mensaje del usuario: ```{message}```
