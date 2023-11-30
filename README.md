@@ -29,8 +29,7 @@ Ya que este programa consume la API de OpenAI por lo que necesitaras agregar la 
 
 ![No se encontró la imagen](Nueva_variable_entorno.png "Nueva variable de entorno")
 
-- Finalmente, debes ingresar el nombre de la variable en el campo "Nombre de la" y la llave de OpenAI en el campo  
-"Valor de la".
+- Finalmente, debes ingresar el nombre de la variable en el campo "Nombre de la" y la llave de OpenAI en el campo "Valor de la".
 
 >[!IMPORTANT]
 >
