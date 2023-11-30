@@ -55,6 +55,5 @@ Ya que este programa consume la API de OpenAI por lo que necesitaras agregar la 
 >- Después de ingresar la primera entrada, se le solicitará al cliente que ingrese su número del documento de identidad, el cual es:  
 >```20252598```
 >
->- Para cerrar el programa en cualquier momento simplemente deberás ingresar:
->
+>- Para cerrar el programa en cualquier momento simplemente deberás ingresar:  
 >```exit```
