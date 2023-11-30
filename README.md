@@ -19,7 +19,7 @@ Abre una terminal e ingresa el siguiente código para instalar las librerías ne
 
 ### 3- Agregar llave de OpenAI las variables de entorno de tu sistema o sesión
 
-Ya que este programa consume la API de OpenAI por lo que necesitaras agregar la llave que tengas en tus variables del sistema o sesión
+Ya que este programa consume la API de OpenAI por lo que necesitaras agregar la llave que tengas en tus variables del sistema o sesión.
 
 - Primero ingresa a tus variables de entorno del sistema:
 
@@ -41,7 +41,7 @@ Ya que este programa consume la API de OpenAI por lo que necesitaras agregar la 
 
 ![No se encontró la imagen](OpenAI_Keys.png "Ejemplo")
 
-## Si seguiste los pasos correctamente, deberías ser capaz de ejecutar el programa correctamente y probarlo
+## Si seguiste los pasos correctamente, deberías ser capaz de ejecutar el programa correctamente y probarlo.
 
 - Este es el archivo que debes ejecutar:
 
