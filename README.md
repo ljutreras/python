@@ -1,29 +1,6 @@
 # ChatBot Ignacio
 
-El objetivo de este programa es devolverle al "cliente" (que es quien utilizara el programa), la información que solicite.  
-Esta información que retorna el progarma es otorgada por el desarrollador del programa, pero es elegida por OpenAI al utilizar su API.
-
-La información que se retorne al cliente dependerá de cuál solicitud pida el cliente, las cuales son:
-
-- Detalle de la deuda
-- Solicitar recibo
-- Formas y lugares de pago
-
-Adicionalmente si el cliente solicita o dice algo diferente de las 3 posibles solicitudes indicadas, el programa le indicara al  
-cliente que solo puede responder a las 3 solicitudes indicadas.
-
->[!IMPORTANT]
->
->- Después de ingresar la primera entrada, se le solicitará al cliente que ingrese su número del documento de identidad, el cual es:  
->20252598
-
-Hay un máximo de 3 intentos para ingresar el número del documento de identidad.
-
-- Para cerrar el programa en cualquier momento simplemente deberás ingresar:
-
-```exit```
-
-- Necesitas una llave de OpenAI para poder utilizar este programa
+El objetivo de este programa es devolverle al "cliente" (que es quien utilizara el programa), la información que solicite.
 
 ## Para poder ejecutar el código tienes que seguir los siguientes pasos:
 
@@ -66,3 +43,18 @@ Ya que este programa consume la API de OpenAI por lo que necesitaras agregar la 
 ![No se encontró la imagen](OpenAI_Keys.png "Ejemplo")
 
 ## Si seguiste los pasos correctamente, deberías ser capaz de ejecutar el programa correctamente y probarlo
+
+- Este es el archivo que debes ejecutar:
+
+![No se encontró la imagen](Archivo_chatbot_ignacio.png "Archivo que hay que ejecutar")
+
+>[!IMPORTANT]
+>
+>- Necesitas una llave de OpenAI para poder utilizar este programa
+>
+>- Después de ingresar la primera entrada, se le solicitará al cliente que ingrese su número del documento de identidad, el cual es:  
+>```20252598```
+>
+>- Para cerrar el programa en cualquier momento simplemente deberás ingresar:
+>
+>```exit```
