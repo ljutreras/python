@@ -1,66 +1,63 @@
-#OBJETIVOS DEL CHAT:
-#Las respuestas serán entregadas por ti , por lo que deberás idear un sistema que te permita entregar una respuesta predefinida .
-#Ninguna respuesta debe ser generada por CHAT GPT.
-
-#FORMATO DEL MENSAJE INICIAL
-
 """ 
-    print()
-    ¡Hola! Bienvendi@ al chat de Movistar!
-
-Estoy para ayudarte en:
-
-•Conocer detalle de tu deuda vencida
-•Formas y lugares de pago
-•Solicitar recibo
-
-        Comentanos,¿qué necesitas?
-
+OBJETIVOS DEL CHAT:
+Las respuestas serán entregadas por ti , por lo que deberás idear un sistema que te permita entregar una respuesta predefinida .
+Ninguna respuesta debe ser generada por ChatGPT.
 """
-
 
 from openai import OpenAI
 import json
 
-
 client = OpenAI()
-
-
 
 #Serie de funciones que seran agregadas a tools para ser llamadas por function calling de acuerdo a cada caso de uso requerido
 
-def detalleDeuda():
-    """Obtener el detalle de la deuda vencida"""
+def get_debt_detail():
 
-    nombre = "Ignacio"
-    servicio = "movil"
-    nro_servicio = "12345"
-    fecha = "08/07"
-    monto_deuda = str(100)
+    """Obtener el detalle de la deuda vencida
 
-    return json.dumps({"nombre": f"{nombre} tienes un recibo pendiente de tu servicio {servicio} {nro_servicio} que vencio el {fecha} por {monto_deuda}. ¿Contamos con tu pago para hoy o mañana?"})
+    Returns:
+        json: Mensaje HardCoded que integra las variables "name","service","service_number","date","debt_amount" para retornar el detalle de la deuda del cliente
+    """    
 
-def formasYLugaresDePago():
-    """Obtener las formas y lugares de pago"""
+    name = "Ignacio"
+    service = "movil"
+    service_number = "12345"
+    date = "08/07"
+    debt_amount = str(100)
 
-    firstParagraph = "En Movistar te brindamos diversas formas de pago SIN COMISIÓN.\nPuedes pagar por Yape: "
-    secondParagraph = ", desde la web o app de tu banco.\nConoce todos los canales de pago en el siguiente link: "
+    return json.dumps({"nombre": f"{name} tienes un recibo pendiente de tu servicio {service} {service_number} que vencio el {date} por {debt_amount}. ¿Contamos con tu pago para hoy o mañana?"})
 
-    return json.dumps({"primer parrafo":firstParagraph,"pagina web para pagar": "https://innovacxion.page.link/mVFa","segundo parrafo":secondParagraph,"canal de pago":"https://www.movistar.com.pe/atencion-al-cliente/lugares-y-medios-de-pago"})
+def get_payment_methods_and_locations():
 
-def solicitarRecibo():
-    """Obtener el recibo"""
-    defaultMessage = "Obten tu recibo con solo unos clics: "
+    """Obtener las formas y lugares de pago
+
+    Returns:
+        json: Mensaje HardCoded que integra las variables "first_paragraph","second_paragraph", para retornar la informacion de las formas y lugares de pago
+    """    
+
+    first_paragraph = "En Movistar te brindamos diversas formas de pago SIN COMISIÓN.\nPuedes pagar por Yape: "
+    second_paragraph = ", desde la web o app de tu banco.\nConoce todos los canales de pago en el siguiente link: "
+
+    return json.dumps({"primer parrafo":first_paragraph,"pagina web para pagar": "https://innovacxion.page.link/mVFa","segundo parrafo":second_paragraph,"canal de pago":"https://www.movistar.com.pe/atencion-al-cliente/lugares-y-medios-de-pago"})
+
+def get_receipt():
+
+    """Obtener el recibo
+
+    Returns:
+        json: Mensaje HardCoded que integra las variables "default_message","b2c" para retornar la información para de obtener el recibo
+    """    
+    default_message = "Obten tu recibo con solo unos clics: "
     b2c = "https://mirecibo.movistar.com.pe/"
     
-    return json.dumps({"mensaje predeterminado":defaultMessage,"url del recibo": b2c})
+    return json.dumps({"mensaje predeterminado":default_message,"url del recibo": b2c})
 
-#Lista de tools (funciones declaradas)
+
 tools = [
         {
             "type": "function",
             "function": {
-                "name": "detalleDeuda",
+                "name": "get_debt_detail",
                 "description": "Obtener el detalle de la deuda vencida",
                 "parameters": {
                     "type": "object",
@@ -71,7 +68,7 @@ tools = [
         {
             "type": "function",
             "function": {
-                "name": "formasYLugaresDePago",
+                "name": "get_payment_methods_and_locations",
                 "description": "Obtener las formas y lugares de pago",
                 "parameters": {
                     "type": "object",
@@ -82,7 +79,7 @@ tools = [
         {
             "type": "function",
             "function": {
-                "name": "solicitarRecibo",
+                "name": "get_receipt",
                 "description": "Obtener el recibo",
                 "parameters": {
                     "type": "object",
@@ -92,44 +89,37 @@ tools = [
         }]
 
 #Primer mensaje de rol system para indicar el comportamiento y logica que debera emplear la AI
-messages = [{"role": "system", "content": "Eres un asistente virtual llamado chat Movistar, posees cuatro funciones: detalleDeuda, formasYLugaresDePago, solicitarRecibo. Tu objetivo es determinar cual funcion utilizar para responderle al cliente, los temas que puedes responder para utilizar las funciones son: Detalle de la deuda, Solicitar recibo, Formas y lugares de pago."}]
+messages = [{"role": "system", "content": "Eres un asistente virtual llamado chat Movistar, posees cuatro funciones: get_debt_detail, get_payment_methods_and_locations, get_receipt. Tu objetivo es determinar cual funcion utilizar para responderle al cliente, los temas que puedes responder para utilizar las funciones son: Detalle de la deuda, Solicitar recibo, Formas y lugares de pago."}]
 
-#system funcional a medias, YA NO ESTA SIENDO UTILIZADO
-""" 
-role": "system", "content": "Eres un asistente virtual llamado chat Movistar y tu objetivo es entregarle al cliente solo una de las tres solicitudes que estan dentro de las comillas angulares, en el caso de que el cliente intente preguntarte otra cosa, debes indicarle que solo puedes responder a una de las siguientes solicitudes solicitadas: <Detalle de la deuda>,<Solicitar recibo>,<Formas y lugares de pago>.
-
- """
-
-
-#MENSAJE INICIAL
+#Mensaje inicial al ejecutar el codigo
 print("\n        ¡Hola! Bienvendi@ al chat de Movistar!\n\nEstoy para ayudarte en:\n • Conocer detalle de tu deuda vencida\n • Formas y lugares de pago\n • Solicitar recibo\n\n        Comentanos,¿qué necesitas?\n")
 
-#Input inicial antes de entrar al ciclo while
-clientInput = input("Cliente: ").lower()
+client_input = input("Cliente: ").lower()
 
-#If que consulta si el cliente respondio la primera vez que se espero una respuesta de él
-if clientInput:
+if client_input == "exit":
+    exit()
 
-    #A continuacion se le indica al cliente que se necesitan datos adicionales para seguir con su consulta, estos datos ingresados seran almacenados en una variable "clientDataInput"
-    print("\n\nNecesito que me des algunos datos para continuar con tu consulta.\nPor favor, ingresa el documento de identidad del titular del servicio.")
+if client_input:
+
+    print("\n\nChat Movistar:\nNecesito que me des algunos datos para continuar con tu consulta.\nPor favor, ingresa el documento de identidad del titular del servicio.")
     
-    #El siguiente ciclo le dara 3 oportunidades al cliente de ingresar bien su sesion (en este ejemplo ingrese "20252598" para iniciar sesion)
-    for loginAttempts in range(3):
+    for login_attempts in range(3):
             
-            #En el caso de que el primer input del cliente fuera "exit" el ciclo se rompera con un break y terminara la ejecucion del codigo, ademas, si dentro del "if clientDataInput = input("\nCliente: ").lower()" el cliente ingresa "exit" tambien se combrobara aqui si el "clientInput" es igual a "exit" para romprer el ciclo for.
-            if clientInput == "exit":
-                 break
+            if client_input == "exit":
+                break
 
-            clientDataInput = input("\nCliente: ").lower()
+            client_data_input = input("\nCliente: ").lower()
 
-            if clientDataInput == "20252598":
-                print("\n\nBienvenido Ignacio\n\n")
+            if client_data_input == "exit":
+                exit()
 
-                
-                while clientInput != "exit":
+            #Aqui esta el documento de identidad que hay que ingresar para iniciar sesion y avanzar en el flujo de ejecución del codigo
+            if client_data_input == "20252598":
+                print("\n\nChat Movistar:\n\nBienvenido Ignacio\n\n")
 
-                    #Aqui se agrega a la lista messages el input inicial que ingreso el cliente
-                    messages.append({"role":"user","content":clientInput})
+                while client_input != "exit":
+
+                    messages.append({"role":"user","content":client_input})
 
                     
                     response = client.chat.completions.create(
@@ -138,38 +128,22 @@ if clientInput:
                     tools=tools,
                     tool_choice="auto")
 
-                    #Respuesta que nos retorna la IA
                     response_message = response.choices[0].message
 
-                    #PRINTS PARA VER LO QUE NOS RETONRA RESPONSE_MESSAGE###
-                    """ print("")
-                    print("RESPONSE MESSAGE:")
-                    print(response_message)
-                    print("") """
-                    #######################################################
-
-                    #Variable(tool_calls) que almacenará la lista de diccionarios de la informacion de la funcion que la AI utilizó
                     tool_calls = response_message.tool_calls
 
-                    #
-                    #Se consulta si se utilizo alguna tool
                     if tool_calls:
                 
-                        #Diccionario que almacenará los los nombres de las funciones disponibles
                         available_functions = {
                         
-                        "detalleDeuda": detalleDeuda,
-                        "formasYLugaresDePago": formasYLugaresDePago,
-                        "solicitarRecibo": solicitarRecibo,
+                        "get_debt_detail": get_debt_detail,
+                        "get_payment_methods_and_locations": get_payment_methods_and_locations,
+                        "get_receipt": get_receipt,
                         
                         }
 
-                        #Se agrega el mensaje que respondio la IA a la lista messages
                         messages.append(response_message)
 
-                        # A continuacion se aprecia un ciclo for para recorrer todas las funciones que fueron utilizadas por medio de tools, en cada ciclo se agregaran los datos de "name" y "content" a las variables function_name("El nombre de la funncion se utilizó") y function_response(el contenido que retorno la funcion utilizada, para encontrar estos contenidos dirigirse a los "returns" de cada funcion).
-
-                        #Finalmente se agrega a la lista messages un diccionario con las claves "tool_call_id"(id generado al llamar a la funcion),"role"(hardcoded a "tool"), "name"(el nombre de la funcion que se utilizó) y "content"(Contenido que retorno la funcion utilizada)
                         for tool_call in tool_calls:
                             
                             function_name = tool_call.function.name
@@ -185,72 +159,33 @@ if clientInput:
 
                                 })
 
+                        movistar_chat_message = ""
 
-                        #Se obtiene la respuesta final de openai en formato string, esto porque accedemos a message.content, luego se agrega a la lista de diccionarios, messages, el chatMovistarMessage que vendria siendo la respuesta final de openai
+                        function_response_dictionary = eval(function_response)
                         
-                        #Variable que contiene un string vacio
-                        chatMovistarMessage = ""
+                        for content in function_response_dictionary.values():
+                            movistar_chat_message += str(content)
 
-                        #Diccionario que recibe un string proveniente de function_response (que vendria siendo el contenido que retorna la funcion al ser utilizada), y luego cambia su tipo de dato a diccionario con la fucnion "eval()"
-                        dictionary = eval(function_response)
-                        
-                        #El siguiente ciclo for recorre el diccionario "dictionary" obteniendo solo sus claves mediantes la funcion "values()" para luego asignarlos a la variable "content" en cada ciclo, a su vez dentro de cada ciclo realizado se cambia el tipo de dato de "content" mediante la clase "str()" para luego agregarlo al string "chatMovistarMessage" (los string que se vayan agregando estaran separados por un espacio vacio)
-                        for content in dictionary.values():
-                            chatMovistarMessage += str(content)
+                        messages.append({"role":"assistant","content":movistar_chat_message})
 
-                        #Se agrega a la lista messages la variable "chatMovistarMessage" con role "assistant" ya que se considera que esta es la respuesta que entrego la IA
-                        messages.append({"role":"assistant","content":chatMovistarMessage})
+                        print("\nChat Movistar:\n" + movistar_chat_message)
 
-                        #PRINTS PARA VER LA LISTA HISTORICA DE LOS MENSAJES DEL CHAT#####
+                        client_input = input("\nCliente: ").lower()
 
-                        """ print("Lista historica de mensajes del chat:")
-                        print(messages)
-                        print("") """
-                        
-                        ##################################################################
-                        print("\nChat Movistar: " + chatMovistarMessage)
-
-                        #Se vuelve a solicitar un input para ver si el cliente tiene alguna otra consulta o quiere terminar el chat ingresando "exit"
-                        clientInput = input("\nCliente: ").lower()
-
-                        
-                    #Se entra en este else en el caso de que lo que haya ingresado el usuario no haga que sea utilizada algunas de las funciones establecidas
                     else:
 
-                        #Mensaje predeterminado establecido, que sera utilizado en caso de que el cliente no ingrese algun input que accione el uso de las funciones disponibles
-                        chatPorDesviacionDeTema = "Lo siento, Solo puedo responder a una de las 3 siguientes solicitudes:\n\n• Detalle de la deuda\n• Solicitar recibo\n• Formas y lugares de pago"
+                        topic_deviation_response = "Lo siento, Solo puedo responder a una de las 3 siguientes solicitudes:\n\n• Detalle de la deuda\n• Solicitar recibo\n• Formas y lugares de pago"
 
-                        #Se agrega este mensaje predeterminado a la lista "messages" ya que se considera como la respuesta de la IA
-                        messages.append({"role":"assistant","content":chatPorDesviacionDeTema})
+                        messages.append({"role":"assistant","content":topic_deviation_response})
 
-                        #PRINTS PARA VER LA LISTA HISTORICA DE LOS MENSAJES DEL CHAT#####
+                        print("\nChat Movistar:\n" + topic_deviation_response)
 
-                        """ print("Lista historica de mensajes del chat:")
-                        print(messages)
-                        print("") """
+                        client_input = input("\nCliente: ").lower()
 
-                        ##################################################################
-                        
-                        #Se imprime el mensaje predeterminado para indicarle al cliente que debe ingresar una solicitud que sea valida segun los casos de uso
-                        print("\nChat Movistar: " + chatPorDesviacionDeTema)
-
-
-                        #Se vuelve a solicitar un input para ver si el cliente tiene alguna otra consulta o quiere terminar el chat ingresando "exit"
-                        clientInput = input("\nCliente: ").lower()
-
-
-
-            #else donde se contaran el numero de intentos que lleva el cliente para iniciar sesion
             else:
-                print("\nNo fue posible validar tu identidad.\nPor favor intenta nuevamente.")
 
-    if clientDataInput != "20252598":
-        print("\nDisculpa no puimos validar tu identidad.\nIntenta más tarde.\nQue tengas un buen dia.\n")
-                
-                
+                print("\nChat Movistar:\nNo fue posible validar tu identidad.\nPor favor intenta nuevamente.")
 
-            
+    if client_data_input != "20252598":
 
-
-
-#######################################################################################################################################
+        print("\nChat Movistar:\nDisculpa no puimos validar tu identidad.\nIntenta más tarde.\nQue tengas un buen dia.\n")

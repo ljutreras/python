@@ -1,23 +1,8 @@
-#OBJETIVOS DEL CHAT:
-#Las respuestas serán entregadas por ti , por lo que deberás idear un sistema que te permita entregar una respuesta predefinida .
-#Ninguna respuesta debe ser generada por CHAT GPT.
-
-#FORMATO DEL MENSAJE INICIAL
-
 """ 
-    print()
-    ¡Hola! Bienvendi@ al chat de Movistar!
-
-Estoy para ayudarte en:
-
-•Conocer detalle de tu deuda vencida
-•Formas y lugares de pago
-•Solicitar recibo
-
-        Comentanos,¿qué necesitas?
-
+OBJETIVOS DEL CHAT:
+Las respuestas serán entregadas por ti , por lo que deberás idear un sistema que te permita entregar una respuesta predefinida .
+Ninguna respuesta debe ser generada por CHAT GPT.
 """
-
 
 from openai import OpenAI
 import json
@@ -43,8 +28,8 @@ def detalleDeuda():
 def formasYLugaresDePago():
     """Obtener las formas y lugares de pago"""
 
-    firstParagraph = "En Movistar te brindamos diversas formas de pago SIN COMISIÓN. Puedes para por Yape: "
-    secondParagraph = ", desde la web o app de tu banco. Conoce todos los canales de pago en el siguiente link: "
+    firstParagraph = "En Movistar te brindamos diversas formas de pago SIN COMISIÓN.\nPuedes pagar por Yape: "
+    secondParagraph = ", desde la web o app de tu banco.\nConoce todos los canales de pago en el siguiente link: "
 
     return json.dumps({"primer parrafo":firstParagraph,"pagina web para pagar": "https://innovacxion.page.link/mVFa","segundo parrafo":secondParagraph,"canal de pago":"https://www.movistar.com.pe/atencion-al-cliente/lugares-y-medios-de-pago"})
 
@@ -111,20 +96,22 @@ clientInput = input("Cliente: ").lower()
 if clientInput:
 
     #A continuacion se le indica al cliente que se necesitan datos adicionales para seguir con su consulta, estos datos ingresados seran almacenados en una variable "clientDataInput"
-    print("\n\n Necesito que me des algunos datos para continuar con tu consulta. Por favor, ingresa el documento de identidad del titular del servicio.")
-    clientDataInput = input("\nCliente: ").lower()
-
-    #Variable que almacenará el numero de veces que el cliente intenta iniciar sesion con los datos que ingresó
-    loginAttepmts = 0
-
-    while loginAttepmts < 2:
+    print("\n\nNecesito que me des algunos datos para continuar con tu consulta.\nPor favor, ingresa el documento de identidad del titular del servicio.")
+    
+    #El siguiente ciclo le dara 3 oportunidades al cliente de ingresar bien su sesion (en este ejemplo ingrese "20252598" para iniciar sesion)
+    for loginAttempts in range(3):
             
-            loginAttepmts += 1
-            
+            #En el caso de que el primer input del cliente fuera "exit" el ciclo se rompera con un break y terminara la ejecucion del codigo, ademas, si dentro del "if clientDataInput = input("\nCliente: ").lower()" el cliente ingresa "exit" tambien se combrobara aqui si el "clientInput" es igual a "exit" para romprer el ciclo for.
+            if clientInput == "exit":
+                 break
+
+            clientDataInput = input("\nCliente: ").lower()
+
+            #El siguiente condicional if comprueba si la variable clientDataI
             if clientDataInput == "20252598":
                 print("\n\nBienvenido Ignacio\n\n")
 
-                
+                #El siguiente bucle while consulta si la variable "clientInput" es distinto de "exit", lo que permite al cliente ejecutar el codigo que esté dentro del bucle
                 while clientInput != "exit":
 
                     #Aqui se agrega a la lista messages el input inicial que ingreso el cliente
@@ -207,14 +194,13 @@ if clientInput:
                         print("") """
                         
                         ##################################################################
+
                         print("\nChat Movistar: " + chatMovistarMessage)
 
                         #Se vuelve a solicitar un input para ver si el cliente tiene alguna otra consulta o quiere terminar el chat ingresando "exit"
                         clientInput = input("\nCliente: ").lower()
 
                         
-
-                    #
                     #Se entra en este else en el caso de que lo que haya ingresado el usuario no haga que sea utilizada algunas de las funciones establecidas
                     else:
 
@@ -239,19 +225,13 @@ if clientInput:
                         #Se vuelve a solicitar un input para ver si el cliente tiene alguna otra consulta o quiere terminar el chat ingresando "exit"
                         clientInput = input("\nCliente: ").lower()
 
-                    #if que en el caso de que el cliente escriba "exit" se le asignara el numero "3" a la variable loginAttempts para salir del while que consulta si el usuario ya supero el numero de intentos para iniciar sesion
-                    if clientInput == "exit":
-                            loginAttepmts = 3
+
 
             #else donde se contaran el numero de intentos que lleva el cliente para iniciar sesion
             else:
-                if loginAttepmts < 3:
-                     print("\nNo fue posible validar tu identidad.\nPor favor intenta nuevamente.")
-                     clientDataInput = input("\nCliente: ").lower()
+                print("\nNo fue posible validar tu identidad.\nPor favor intenta nuevamente.")
+
+    if clientDataInput != "20252598":
+        print("\nDisculpa no puimos validar tu identidad.\nIntenta más tarde.\nQue tengas un buen dia.\n")
                 
-
-            
-
-
-
 #######################################################################################################################################
