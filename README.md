@@ -1,61 +1,56 @@
 # CHATBOT MOVISTAR
 
-Asistente virtual diseñado para entregar información sobre un servicio telefónico en base a la inteligencia artificial de OpenAI. 
+Asistente virtual diseñado para proporcionar información sobre un servicio telefónico mediante la inteligencia artificial de OpenAI.
 
 ## Primeros pasos
 
-1. Es recomendable trabajar en base a un entorno virtual, para ello utilizaremos el siguiente comando desde nuestra consola:
+1. Se recomienda trabajar en un entorno virtual. Para ello, utiliza el siguiente comando desde tu consola:
 
-\`\`\`bash
-python -m venv venv
-\`\`\`
+    ```bash
+    python -m venv venv
+    ```
 
-2. Ya tienes tu entorno virtual. Perfecto! Solo nos queda activarla, para ello utilizaremos el siguiente comando:  
+2. ¿Ya tienes tu entorno virtual? ¡Perfecto! Ahora solo falta activarlo. Utiliza uno de los siguientes comandos:
 
-#### Forma 1
+    #### Forma 1
+    ```bash
+    source c:/ruta/de/carpeta/python/venv/Scripts/activate
+    ```
 
-\`\`\`bash  
-source c:/ruta/de/carpeta/python/venv/Scripts/activate
-\`\`\`
+    #### Forma 2
+    Desde VSCode, sigue estos pasos:
+    ```
+    CTRL + SHIFT + P
+    Python: Select Interpreter
+    ⭐​Python 3.12.0 ('venv': venv) Recommended
+    ```
 
-#### Forma 2
+3. A continuación, realiza la instalación de las librerías para nuestro proyecto. Se proporciona un archivo `REQUIREMENTS.txt` que se instala de la siguiente manera:
 
-Desde VSCode haremos lo siguiente:  
+    ```bash
+    pip install -r REQUIREMENTS.txt
+    ```
 
-\`\`\`  
-CTRL + SHIFT + P
-Python: Select Interpreter
-⭐️Python 3.12.0 ('venv': venv) Recommended  
-\`\`\`
+4. ¡Perfecto! Casi lo tienes. Solo falta generar un archivo `.env` para agregar el token que permitirá utilizar la aplicación:
 
-3. Lo siguiente que debes realizar es la instalación de las librerías para nuestro proyecto. Para ello he proporcionado un archivo REQUIREMENTS.txt, el cual se instala de la siguiente manera:
+    ```
+    API_KEY='sk-token_de_openai'
+    ```
 
+    ⛔​ **Por razones de seguridad, no puedo proporcionar el token. Agradezco tu comprensión.** ⛔​
 
-\`\`\`bash
-pip install -r REQUIREMENTS.txt
-\`\`\`   
+## Ahora solo queda ejecutar nuestra aplicación
 
-4. Perfecto! Ya casi lo tienes, solo queda generar un archivo .env para poder agregar el token que te permitirá utilizar la aplicación:  
+1. Desde la consola, dirígete a la carpeta `chat` de tu proyecto:
 
-\`\`\`
-API_KEY='sk-token_de_openai'
-\`\`\`
+    ```bash
+    cd chat
+    ```
 
-#### ⛔️ Por temas de seguridad no puedo proporcionar el token, sé que lo entenderás ⛔️  
+2. Ejecuta la aplicación con el siguiente comando:
 
+    ```bash
+    py main.py
+    ```
 
-## Ya solo queda ejecutar nuestra aplicación  
-
-1. Desde la consola nos situamos en la carpeta chat de nuestro proyecto:
-
-\`\`\`bash  
-cd chat
-\`\`\`
-
-2. Ejecutamos nuestra aplicación con el comando: 
-
-\`\`\`bash   
-python main.py
-\`\`\`
-
-## 🥳 Felicidades! Ya tienes todo lo necesario para interactuar con la aplicación 🥳
+## 🥳 ¡Felicidades! Ya tienes todo lo necesario para interactuar con la aplicación 🥳
