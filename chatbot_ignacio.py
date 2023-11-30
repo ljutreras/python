@@ -111,16 +111,17 @@ clientInput = input("Cliente: ").lower()
 if clientInput:
 
     #A continuacion se le indica al cliente que se necesitan datos adicionales para seguir con su consulta, estos datos ingresados seran almacenados en una variable "clientDataInput"
-    print("\n\n Necesito que me des algunos datos para continuar con tu consulta. Por favor, ingresa el documento de identidad del titular del servicio.")
-    clientDataInput = input("\nCliente: ").lower()
-
-    #Variable que almacenará el numero de veces que el cliente intenta iniciar sesion con los datos que ingresó
-    loginAttepmts = 0
-
-    while loginAttepmts < 2:
+    print("\n\nNecesito que me des algunos datos para continuar con tu consulta.\nPor favor, ingresa el documento de identidad del titular del servicio.")
+    
+    #El siguiente ciclo le dara 3 oportunidades al cliente de ingresar bien su sesion (en este ejemplo ingrese "20252598" para iniciar sesion)
+    for loginAttempts in range(3):
             
-            loginAttepmts += 1
-            
+            #En el caso de que el primer input del cliente fuera "exit" el ciclo se rompera con un break y terminara la ejecucion del codigo, ademas, si dentro del "if clientDataInput = input("\nCliente: ").lower()" el cliente ingresa "exit" tambien se combrobara aqui si el "clientInput" es igual a "exit" para romprer el ciclo for.
+            if clientInput == "exit":
+                 break
+
+            clientDataInput = input("\nCliente: ").lower()
+
             if clientDataInput == "20252598":
                 print("\n\nBienvenido Ignacio\n\n")
 
@@ -213,8 +214,6 @@ if clientInput:
                         clientInput = input("\nCliente: ").lower()
 
                         
-
-                    #
                     #Se entra en este else en el caso de que lo que haya ingresado el usuario no haga que sea utilizada algunas de las funciones establecidas
                     else:
 
@@ -239,15 +238,15 @@ if clientInput:
                         #Se vuelve a solicitar un input para ver si el cliente tiene alguna otra consulta o quiere terminar el chat ingresando "exit"
                         clientInput = input("\nCliente: ").lower()
 
-                    #if que en el caso de que el cliente escriba "exit" se le asignara el numero "3" a la variable loginAttempts para salir del while que consulta si el usuario ya supero el numero de intentos para iniciar sesion
-                    if clientInput == "exit":
-                            loginAttepmts = 3
+
 
             #else donde se contaran el numero de intentos que lleva el cliente para iniciar sesion
             else:
-                if loginAttepmts < 3:
-                     print("\nNo fue posible validar tu identidad.\nPor favor intenta nuevamente.")
-                     clientDataInput = input("\nCliente: ").lower()
+                print("\nNo fue posible validar tu identidad.\nPor favor intenta nuevamente.")
+
+    if clientDataInput != "20252598":
+        print("\nDisculpa no puimos validar tu identidad.\nIntenta más tarde.\nQue tengas un buen dia.\n")
+                
                 
 
             
