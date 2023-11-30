@@ -1,5 +1,14 @@
-def formas_y_lugares_de_pago(message):
-    prompt = f"""Tu tarea es limitarte a dar la informacion de formas y lugares de pago
+def formas_y_lugares_de_pago(message: str):
+    """proporcionan las formas y lugares de pago que tiene un usuario mediante un formato predefinido entre triple comillas dobles
+
+    Args:
+        message (str): se entregará una opcion valida del servicio de formas y lugares de pago
+
+    Returns:
+        prompt (str): genera una respuestas la cual incluye las formas y lugares de pago
+    """
+      
+    prompt: str = f"""Tu tarea es limitarte a dar la informacion de formas y lugares de pago delimitado por las triples comillas dobles. \
 
                 Primero debes retornar un mensaje \"necesito consultar algunos datos para continuar con tu consulta. Por favor, ingresa el documento de identidad DNI numerico del titular del servicio\"\
                 el documento de identidad del titular debe ser su DNI en formato de tipo numerico de maximo 9 caracteres y minimo 8 caracteres \

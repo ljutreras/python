@@ -2,7 +2,6 @@ import json
 import openai
 import os
 from dotenv import load_dotenv
-from prompt_general import prompt_general
 from despedida import despedida
 from servicios.detalle import detalle_de_la_deuda
 from servicios.recibo import solicitar_recibo
@@ -10,15 +9,25 @@ from servicios.formas_y_lugares import formas_y_lugares_de_pago
 
 load_dotenv()
 
-openai.api_key  = os.getenv('API_KEY')
+openai.api_key: str | None  = os.getenv('API_KEY')
 
-def get_completion_from_messages(messages):
-    tools = [
+def get_completion_from_messages(messages: str):
+    """ conexion con openai mediante un historial de conversaciones y function callings
+
+    Args:
+        messages (str): el mensaje será proporcionado por el usuario el cual será derivado a las funciones si así lo infiere openai
+
+    Returns:
+        second_resonse (str) : respuesta de las diferentes funciones dentro de las function calling mencionadas en los tools
+        response_message (str): respuesta si el mensaje no se encuentra dentro de las funciones proporcionadas en los tools
+    """    
+
+    tools: list[dict] = [
                 {
                     "type": "function",
                     "function": {
                         "name": "detalle_de_la_deuda",
-                        "description": "obtiene el detalle de la deuda desde la base de datos mediante un prompt",
+                        "description": "proporciona un detalle de la deuda del usuario",
                         "parameters": {
                             "type": "object",
                             "properties": {
@@ -41,7 +50,7 @@ def get_completion_from_messages(messages):
                             "properties": {
                                 "message": {
                                     "type": "string",
-                                    "description": "se entregará una opcion valida del servicio detalle de la deuda",
+                                    "description": "se entregará una opcion valida del servicio solicitar un recibo",
                                 },
                             },
                             "required": ["message"],
@@ -58,7 +67,7 @@ def get_completion_from_messages(messages):
                             "properties": {
                                 "message": {
                                     "type": "string",
-                                    "description": "se entregará una opcion valida del servicio detalle de la deuda",
+                                    "description": "se entregará una opcion valida del servicio de formas y lugares de pago",
                                 },
                             },
                             "required": ["message"],
@@ -83,18 +92,18 @@ def get_completion_from_messages(messages):
                     },
                 }
             ]
-    response = openai.chat.completions.create(
+    response: any = openai.chat.completions.create(
         model='gpt-3.5-turbo-1106',
         messages=messages,
         tools=tools,
         tool_choice="auto",
         temperature=0,
     )
-    response_message = response.choices[0].message
-    tool_calls = response_message.tool_calls
+    response_message: any = response.choices[0].message
+    tool_calls: list[any] | None = response_message.tool_calls
 
     if tool_calls:
-        available_functions = {
+        available_functions: dict[str: any] = {
             "detalle_de_la_deuda": detalle_de_la_deuda,
             "solicitar_recibo": solicitar_recibo,
             "formas_y_lugares_de_pago": formas_y_lugares_de_pago,
@@ -118,29 +127,36 @@ def get_completion_from_messages(messages):
                 }
             )
 
-        second_response = openai.chat.completions.create(
+        second_response: any = openai.chat.completions.create(
             model="gpt-3.5-turbo-1106",
             messages=messages,
             temperature=0
-        )
-        print("🚀 ~ file: main.py:118 ~ function_name:", function_name)
-        
+        )      
         return second_response.choices[0].message.content
     else:
         return response_message.content
 
+context: list[dict] = [ {'role':'system', 'content':"""
+                        Eres un asistente virtual de Movistar, tu tarea principal es entregar informacion sobre el servicio telefonico. \
+                        tienes 3 opciones disponibles, datalle de la deuda, formas y lugares de pago, solicitar un recibo. \
 
-context = [ {'role':'system', 'content':"""
-Eres chat de Movistar, un servicio que entrega la deuda del servicio telefonico de un usuario. \
-estás diseñado estrictamente para entregar información sobre el detalle de la deuda, formas y lugares de pago además de solicitar un recibo \
-Espera para tener la solicitud completa por parte del usuario y comprueba si hay un final \
-dale tiempo para saber si el cliente quiere añadir algo más. \
-Respondes en un estilo amigable breve y muy conversacional sin emojis \
-debes mencionarle que ingrese la palabra SALIR para terminar la conversacion. \
+                        una vez recibido el mensaje del usuario debes retornar un mensaje \"necesito consultar algunos datos para continuar con tu consulta. Por favor, ingresa el documento de identidad DNI numerico del titular del servicio\"\
+                        el documento de identidad del titular debe ser su DNI en formato de tipo numerico de maximo 9 caracteres y minimo 8 caracteres \
+                        si el usuario ingresa otro mensaje, debes repetir de que ingrese el DNI del titular. \
+                        cada vez que el usuario elija una opcion verifica si ya había proporcionado el DNI.\
+                        si es así, no vuelvas a solicitarlo. \
+                        una vez retornado la respuesta de las funciones debes darle a conocer las opciones restantes. \
+                        de no ser una opcion valida, debes mencionarle que se mantengan en el contexto del servicio telefonico volviendo a repetir las opciones validas \
+                        no respondas preguntas que no tienen un contexto de pago de cuentas \
+                        dale tiempo al usuario en caso de querer hacer una consulta a las otras opciones disponibles. \
+                        Debes responder en un estilo amigable breve. \
+                        debes mencionar que ingrese la palabra \"salir\" para finalizar la conversación.                        
 """
 }]
 
-response = """
+
+# Mensaje de bienvenida
+response: str = """
 ¡Hola! Bienvenid@ al chat de Movistar!
 Estoy para ayudarte en:
 🔹​Conocer detalle de tu deuda vencida
@@ -148,17 +164,16 @@ Estoy para ayudarte en:
 🔹​Solicitar recibo
 Comentanos, ¿qué necesitas?\n
 """
-
 print(response)
 
 while True:
-    input_user = input('User: ')
+    input_user: str = input('User: ')
     print(' ')
-    if input_user.lower() == '' or 'hola' in input_user.lower():
+    if input_user.lower() == '':
         print(response)
     elif 'salir' not in input_user.lower():
         context.append({'role': 'user', 'content': input_user.lower()})
-        response = get_completion_from_messages(context)
+        response: str = get_completion_from_messages(context)
         context.append({'role':'assistant', 'content': response})
         print(f'Assistant: {response} \n')
     else:

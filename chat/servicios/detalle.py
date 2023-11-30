@@ -1,9 +1,14 @@
-def detalle_de_la_deuda(message):
-    prompt = f"""Tu tarea es dar el detalle de la deuda de un usuario
+def detalle_de_la_deuda(message: str):
+    """proporciona el detalle de la deuda de un usuario mediante un formato predefinido entre triple comillas dobles
 
-            Primero debes retornar un mensaje \"necesito consultar algunos datos para continuar con tu consulta. Por favor, ingresa el documento de identidad DNI numerico del titular del servicio\"\
-            el documento de identidad del titular debe ser su DNI en formato de tipo numerico de maximo 9 caracteres y minimo 8 caracteres \
-            si el usuario ingresa otro mensaje, debes repetir de que ingrese el DNI del titular \
+    Args:
+        message (str): se entregará una opcion valida del servicio detalle de la deuda
+
+    Returns:
+        prompt (str): proporciona un detalle de la deuda del usuario
+    """        
+        
+    prompt: str = f"""Tu tarea es dar el detalle de la deuda de un usuario \
             luego retornas el contenido delimitado por triple comillas dobles. \
             \"\"\"DETALLE DE LA DEUDA
             Estimado client@ cuyo registro termina en <DNI> 
