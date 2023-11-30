@@ -1,27 +1,18 @@
 import json
-from typing import Optional
 import openai
 import os
 from dotenv import load_dotenv
-from pydantic import BaseModel
 from prompt_general import prompt_general
-from db.mysql_repository import connect_to_database
+from despedida import despedida
 from servicios.detalle import detalle_de_la_deuda
 from servicios.recibo import solicitar_recibo
 from servicios.formas_y_lugares import formas_y_lugares_de_pago
 
 load_dotenv()
 
-connection = connect_to_database()
-cursor = connection.cursor()
-
-class User(BaseModel):
-    id: Optional[str] = ''
-    message: str
-
 openai.api_key  = os.getenv('API_KEY')
 
-def get_completion_from_messages(messages, temperature=0):
+def get_completion_from_messages(messages):
     tools = [
                 {
                     "type": "function",
@@ -73,6 +64,23 @@ def get_completion_from_messages(messages, temperature=0):
                             "required": ["message"],
                         }
                     },
+                },
+                {
+                    "type": "function",
+                    "function": {
+                        "name": "despedida",
+                        "description": "genera una respuesta fija como despedida la cual incluye el resumen de lo conversado",
+                        "parameters": {
+                            "type": "object",
+                            "properties": {
+                                "message": {
+                                    "type": "string",
+                                    "description": "se entregará una despedida bajo un contexto de resumen",
+                                },
+                            },
+                            "required": ["message"],
+                        }
+                    },
                 }
             ]
     response = openai.chat.completions.create(
@@ -80,7 +88,7 @@ def get_completion_from_messages(messages, temperature=0):
         messages=messages,
         tools=tools,
         tool_choice="auto",
-        temperature=temperature, # this is the degree of randomness of the model's output
+        temperature=0,
     )
     response_message = response.choices[0].message
     tool_calls = response_message.tool_calls
@@ -89,7 +97,8 @@ def get_completion_from_messages(messages, temperature=0):
         available_functions = {
             "detalle_de_la_deuda": detalle_de_la_deuda,
             "solicitar_recibo": solicitar_recibo,
-            "formas_y_lugares_de_pago": formas_y_lugares_de_pago
+            "formas_y_lugares_de_pago": formas_y_lugares_de_pago,
+            "despedida": despedida
             }
         messages.append(response_message)
         
@@ -114,33 +123,23 @@ def get_completion_from_messages(messages, temperature=0):
             messages=messages,
             temperature=0
         )
-        print(function_name)
+        print("🚀 ~ file: main.py:118 ~ function_name:", function_name)
+        
         return second_response.choices[0].message.content
     else:
-        print('fuera del tools')
         return response_message.content
 
 
 context = [ {'role':'system', 'content':"""
 Eres chat de Movistar, un servicio que entrega la deuda del servicio telefonico de un usuario. \
-una vez ingresado a una opcion debes retornar un mensaje \"necesito consultar algunos datos para continuar con tu consulta. Por favor, ingresa el documento de identidad DNI numerico del titular del servicio\"\
-el documento de identidad del titular debe ser su DNI en formato de tipo numerico de maximo 9 caracteres y minimo 8 caracteres \
-si el usuario ingresa otro mensaje, debes repetir de que ingrese el DNI del titular \
+
 Espera para tener la solicitud completa por parte del usuario y comprueba si hay un final \
 dale tiempo para saber si el cliente quiere añadir algo más. \
 Asegúrese de aclarar todas las opciones \
-Respondes en un estilo amigable breve y muy conversacional sin emojis. \
-Para finalizar la conversación debes mencionarle que ingrese la palabra SALIR para terminar la conversacion. \
+Respondes en un estilo amigable breve y muy conversacional sin emojis \
+debes mencionarle que ingrese la palabra SALIR para terminar la conversacion. \
 """
 }]
-
-# def get_completion_from_messages_test(messages, model="gpt-3.5-turbo", temperature=0):
-#     response = openai.chat.completions.create(
-#         model=model,
-#         messages=messages,
-#         temperature=temperature, # this is the degree of randomness of the model's output
-#     )
-#     return response.choices[0].message.content
 
 response = """
 ¡Hola! Bienvenid@ al chat de Movistar!

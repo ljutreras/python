@@ -1,6 +1,9 @@
 def solicitar_recibo(message):
     prompt = f"""Tu tarea es dar la informacion de donde solicitar el recibo
-                        
+                     
+            Primero debes retornar un mensaje \"necesito consultar algunos datos para continuar con tu consulta. Por favor, ingresa el documento de identidad DNI numerico del titular del servicio\"\
+            el documento de identidad del titular debe ser su DNI en formato de tipo numerico de maximo 9 caracteres y minimo 8 caracteres \
+            si el usuario ingresa otro mensaje, debes repetir de que ingrese el DNI del titular \   
             siempre y cuando hayas obtenido el DNI debes retornar el contenido delimitado por triple comillas dobles a continuación. \
             \"\"\"SOLICITAR RECIBO \n \
             Obten tu recibo con solo unos clics \n \
