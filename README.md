@@ -1,3 +1,6 @@
+## Importante
+El chat se mantiene en uso siempre y cuando el servidor este levantado, para reiniciarlo se recomiendo bajar el servicor y volver a levantar.
+
 ## Chat-Bot 
 El uso de un chat bot interctuando con el cliente
 
