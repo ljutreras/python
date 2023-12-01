@@ -24,6 +24,9 @@ def esSaludo(mensaje_usuario: str) -> bool:
     mensaje_usuario = mensaje_usuario.lower()
     return any(saludo in mensaje_usuario for saludo in saludos)
 
+def esMovistar():
+    return "Perfecto, por favor introduzca su numero de identificacion"
+
 def bienvenida() -> str:
     """ Saluda con un mensaje predeterminado """
 
@@ -34,15 +37,16 @@ def validarCliente(identificacion: str) -> str:
     se cierra cuando el usuario se equivoca mas de dos veces.
     Solo recibe digitos para realizar la validaciones ejemplo: 123456= que sería valido o 1234 = sería no válido """
 
+    numeros_identificacion = ''.join(filter(str.isdigit, identificacion))
     intentos_fallidos = sum(1 for msg in historial_conversacion if "inválido" in msg.get("content", ""))
-
-    if len(identificacion) == 6 and identificacion.isdigit():
+    if len(numeros_identificacion) == 6:
+        intentos_fallidos = 0
         return "Número de cliente validado. Hola Carlos, puedo ayudarte con; 1) Conocer detalle de su deuda vencida, 2) formas y lugares de pago o 3) Solicitar recibo. Coméntanos. ¿Qué necesitas?"
     
-    if intentos_fallidos < 2:
+    intentos_fallidos += 1
+    if intentos_fallidos >= 2:
         return "Número de cliente inválido. Por favor, ingresa un número de 6 dígitos."
-    else:
-        return "Demasiados intentos fallidos. Por favor, intenta más tarde."
+    return "Demasiados intentos fallidos. Por favor, intenta más tarde."
 
 def deuda():
     """ Cuando se valida solo consumira el mensaje de Carlos para demostrar que esta validado """
@@ -71,7 +75,7 @@ def lugaresPago():
 
 def esDespedida(mensaje_usuario: str) -> bool:
     """ detecta el mensaje para salir de la conversacion """
-    despedidas = ["adiós", "hasta luego", "chao", "nos vemos", "gracias", "muchas gracias"]
+    despedidas = ["adios", "hasta luego", "chao", "nos vemos", "gracias", "muchas gracias"]
     mensaje_usuario = mensaje_usuario.lower()
     return any(despedida in mensaje_usuario for despedida in despedidas)   
 
@@ -80,13 +84,24 @@ def despedida():
 
     return "Gracias por usar los servicios de Movistar. ¡Que tengas un buen día!"
 
+def esperarPago():
+    return "Perfecto, guardaremos en el sistema que mañana pagará. ¿Necesita realizar algun otro requerimiento?"
+
+def otroServicio():
+    return "Lamento informar que solo puedo optener información de, 1) Conocer detalle de su deuda vencida, 2) formas y lugares de pago o 3) Solicitar recibo, para más información por favor llamar al 600 600 600"
+
+def fueraContexto():
+    return "Lo siento mucho, pero solo puedo brindar ayudar con Movistar. ¿Eres cliente Movistar?"
+
 @app.post("/chat")
 def ask_movistar(user: User):
     global historial_conversacion
     user_message = user.user_message.strip()
     if not user_message: 
         return {"message": "Por var, introduzca un mensaje"}
-    contexto_bot = [{"role":"system", "content": "Eres un asistente virtual llamado REL Movistar, posees las siguientes funciones: bienvenida, validarCliente, deuda, recibo o lugaresPago. Tu objetivo es decidir cual funcion utulizar para responderle al clente."}]
+    contexto_bot = [{"role":"system", "content": "Eres un asistente virtual llamado REL Movistar, posees las siguientes funciones: bienvenida, validarCliente, deuda, recibo o lugaresPago. Tu objetivo es decidir cual funcion utulizar para responderle al clente."},
+                    {"role": "user", "content": "Como te llamas?"},
+                    {"role": "assistant", "content": "Soy REL asistente de Movistar.Y puedo ayudarte con; 1) Conocer detalle de su deuda vencida, 2) formas y lugares de pago o 3) Solicitar recibo."}]
     historial_conversacion.append({"role": "user", "content": user.user_message})
 
     # Define las herramientas disponibles
@@ -96,7 +111,10 @@ def ask_movistar(user: User):
         {"type": "function", "function": {"name": "deuda", "description": "Mensaje de deuda", "parameters": {"type":"object", "properties": {}}}},
         {"type": "function", "function": {"name": "recibo", "description": "Mensaje de recibo", "parameters": {"type":"object", "properties": {}}}},
         {"type": "function", "function": {"name": "lugaresPago", "description": "Mensaje de lugares de pago", "parameters": {"type":"object", "properties": {}}}},
-
+        {"type": "function", "function": {"name": "fueraContexto", "description": "Mensaje si es que se sale de contexto", "parameters": {"type":"object", "properties": {}}}},
+        {"type": "function", "function": {"name": "esMovistar", "description": "Mensaje para el usuario que es Movistar", "parameters": {"type":"object", "properties": {}}}},
+        {"type": "function", "function": {"name": "esperarPago", "description": "Mensaje para el usuario que es Movistar", "parameters": {"type":"object", "properties": {}}}},
+        {"type": "function", "function": {"name": "otroServicio", "description": "Mensaje para mostrar por otros servicio", "parameters": {"type":"object", "properties": {}}}},
     ]
 
     # Llamada a la API de OpenAI
@@ -131,6 +149,14 @@ def ask_movistar(user: User):
                     bot_response += lugaresPago()
                 elif tool_function_name == "despedida":
                     bot_response += despedida()
+                elif tool_function_name == "fueraContexto":
+                    bot_response += fueraContexto()
+                elif tool_function_name == "esMovistar":
+                    bot_response += esMovistar()
+                elif tool_function_name == "esperarPago":
+                    bot_response += esperarPago()
+                elif tool_function_name == "otroServicio":
+                    bot_response += otroServicio()
         
     historial_conversacion.append({"role": "assistant", "content": bot_response})
     return {"message": bot_response}
