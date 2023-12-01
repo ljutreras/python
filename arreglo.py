@@ -24,7 +24,12 @@ def esSaludo(mensaje_usuario: str) -> bool:
     mensaje_usuario = mensaje_usuario.lower()
     return any(saludo in mensaje_usuario for saludo in saludos)
 
+def nombre():
+    """ Darle más identidad al chat """
+    return "Me llamo REL y soy un asistente de Movistar, encantado de conocerte. ¿Eres cliente de Movistar?"
+
 def esMovistar():
+    """ Esto en el caso de que si el usuario se desvía y aclara que si es usuario de Movistar """
     return "Perfecto, por favor introduzca su numero de identificacion"
 
 def bienvenida() -> str:
@@ -85,12 +90,18 @@ def despedida():
     return "Gracias por usar los servicios de Movistar. ¡Que tengas un buen día!"
 
 def esperarPago():
+    """ Este mensaje aparece cuando el usuario comenta que pagará el día de mañana, después de estar arrojar el mensaje de deuda """
+
     return "Perfecto, guardaremos en el sistema que mañana pagará. ¿Necesita realizar algun otro requerimiento?"
 
 def otroServicio():
+    """ Esta funcion aparece cuando el usuario pregunta por otros servicios de Movistar """
+
     return "Lamento informar que solo puedo optener información de, 1) Conocer detalle de su deuda vencida, 2) formas y lugares de pago o 3) Solicitar recibo, para más información por favor llamar al 600 600 600"
 
 def fueraContexto():
+    """ Esta funcion aparece cuando el usuario saca de contexto al Chat """
+
     return "Lo siento mucho, pero solo puedo brindar ayudar con Movistar. ¿Eres cliente Movistar?"
 
 @app.post("/chat")
@@ -115,6 +126,7 @@ def ask_movistar(user: User):
         {"type": "function", "function": {"name": "esMovistar", "description": "Mensaje para el usuario que es Movistar", "parameters": {"type":"object", "properties": {}}}},
         {"type": "function", "function": {"name": "esperarPago", "description": "Mensaje para el usuario que es Movistar", "parameters": {"type":"object", "properties": {}}}},
         {"type": "function", "function": {"name": "otroServicio", "description": "Mensaje para mostrar por otros servicio", "parameters": {"type":"object", "properties": {}}}},
+        {"type": "function", "function": {"name": "nombre", "description": "Mensaje para mostrar su identidad", "parameters": {"type":"object", "properties": {}}}},
     ]
 
     # Llamada a la API de OpenAI
@@ -157,6 +169,8 @@ def ask_movistar(user: User):
                     bot_response += esperarPago()
                 elif tool_function_name == "otroServicio":
                     bot_response += otroServicio()
+                elif tool_function_name == "nombre":
+                    bot_response += nombre()
         
     historial_conversacion.append({"role": "assistant", "content": bot_response})
     return {"message": bot_response}
