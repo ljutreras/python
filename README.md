@@ -1,18 +1,18 @@
-# Chat-Bot 
+## Chat-Bot 
 El uso de un chat bot interctuando con el cliente
 
-<em> Instalar las librerías necesarias </em>
+## Instalar las librerías necesarias 
 pip install -r REQUIREMENTS.txt
 Tener instalado Postman
 
-<em> Tener la variable de entorno <7em>
+# Tener la variable de entorno 
 De forma local en un archivo .env
 
-<em> Uso </em>
-#1) Levantando el sistema de uvicorn escribiendo:
+## Uso
+# 1) Levantando el sistema de uvicorn escribiendo:
 uvicorn consulta:app --reload
 
-#2) Ahora en postman:
+# 2) Ahora en postman:
 Seleccionamos Body --> raw --> y en la lista que sale a la izquierda marcamos Json
 
 Copiamos la url:
