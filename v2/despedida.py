@@ -5,5 +5,6 @@ def despedida():
     """        
     prompt: str = f"""
             ¡Gracias por contactarnos, que tengas buena tarde!
+            Recuerda que si escribes 'salir' puedes finalizar la conversación
             """
     return prompt

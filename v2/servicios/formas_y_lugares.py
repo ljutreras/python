@@ -16,5 +16,6 @@ def formas_y_lugares_de_pago():
                 desde la web o app de tu banco. \
                 Conoce todos los canales de pago en el siguiente link \
                 https://www.movistar.com.pe/atencion-al-cliente/lugares-y-medios-de-pago
+                Recuerda que si escribes 'salir' puedes finalizar la conversación
             """
     return prompt

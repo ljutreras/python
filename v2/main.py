@@ -6,6 +6,7 @@ from despedida import despedida
 from servicios.detalle import detalle_de_la_deuda
 from servicios.recibo import solicitar_recibo
 from servicios.formas_y_lugares import formas_y_lugares_de_pago
+import function_calling
 
 load_dotenv()
 
@@ -99,20 +100,6 @@ def get_completion_from_messages(messages: str):
                     "content": function_response,
                 }
             )
-
-        # "detalle_de_la_deuda": detalle_de_la_deuda,
-        # "solicitar_recibo": solicitar_recibo,
-        # "formas_y_lugares_de_pago": formas_y_lugares_de_pago,
-        # "despedida": despedida
-        print(function_name)
-        if function_name == detalle_de_la_deuda:
-            print(function_response)
-        elif function_name == solicitar_recibo:
-            print(function_response)
-        elif function_name == formas_y_lugares_de_pago:
-            print(function_response)
-        elif function_name == despedida:
-            print(function_response)
         return function_response
     else:
         return response_message.content

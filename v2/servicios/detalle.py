@@ -10,5 +10,6 @@ def detalle_de_la_deuda():
             Estimado client@
             Tienes un recibo pendiente de tu servicio <MOVIL/HOGAR> N° Servicio 7556 
             que venció el 09/23 por CLP 25.000
+            Recuerda que si escribes 'salir' puedes finalizar la conversación
             """
     return prompt

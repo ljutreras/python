@@ -10,5 +10,7 @@ def solicitar_recibo():
             SOLICITAR RECIBO
             Obten tu recibo con solo unos clics
             https://mirecibo.movistar.com.pe
+            Recuerda que si escribes 'salir' puedes finalizar la conversación
+
             """
     return prompt
