@@ -44,7 +44,7 @@ Asistente virtual diseñado para proporcionar información sobre un servicio tel
 1. Desde la consola, dirígete a la carpeta `chat` de tu proyecto:
 
     ```bash
-    cd chat
+    cd v2
     ```
 
 2. Ejecuta la aplicación con el siguiente comando:

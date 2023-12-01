@@ -1,4 +1,4 @@
-def despedida(message):
+def despedida(message: str):
     """ proporciona un mensaje de despida junto a un resumen de lo conversado
 
     Args:
@@ -15,8 +15,9 @@ def despedida(message):
             <DETALLE DE LA DEUDA>
             <FORMAS Y LUGARES DE PAGO>
             <SOLICITUD DE RECIBO>
+            recuerda que con la palabra \"salir\" puedes finalizar el chat
             \"\"\" \
-            el campo <DETALLE DE LA DEUDA> <FORMAS Y LUGARES DE PAGO> y <SOLICITUD DE RECIBO> serán proporcionado por la asistentesiempre y cuando hayan sido solicitados previamente\
+            el campo <DETALLE DE LA DEUDA> <FORMAS Y LUGARES DE PAGO> y <SOLICITUD DE RECIBO> serán proporcionado por la asistente siempre y cuando hayan sido solicitados previamente\
             de lo contrario el campo quedará vacio \
             la informacion obtenida será delimitada por triples comillas invertidas.\
 
