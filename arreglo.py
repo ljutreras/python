@@ -107,13 +107,15 @@ def fueraContexto():
 @app.post("/chat")
 def ask_movistar(user: User):
     global historial_conversacion
+    print("soy un historial", historial_conversacion)
     user_message = user.user_message.strip()
     if not user_message: 
         return {"message": "Por var, introduzca un mensaje"}
-    contexto_bot = [{"role":"system", "content": "Eres un asistente virtual llamado REL Movistar, posees las siguientes funciones: bienvenida, validarCliente, deuda, recibo o lugaresPago. Tu objetivo es decidir cual funcion utulizar para responderle al clente."},
+    contexto_bot = [{"role":"system", "content": "Eres un asistente virtual llamado REL Movistar, posees las siguientes funciones: bienvenida, validarCliente, deuda, recibo, lugaresPago, fueraContexto, esMovistar, esperarPago, otroServicio, nombre. Tu objetivo es decidir cual funcion utulizar para responderle al clente."},
                     {"role": "user", "content": "Como te llamas?"},
                     {"role": "assistant", "content": "Soy REL asistente de Movistar.Y puedo ayudarte con; 1) Conocer detalle de su deuda vencida, 2) formas y lugares de pago o 3) Solicitar recibo."}]
     historial_conversacion.append({"role": "user", "content": user.user_message})
+    
 
     # Define las herramientas disponibles
     tools = [
