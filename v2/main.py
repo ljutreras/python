@@ -2,28 +2,18 @@ import json
 import openai
 import os
 from dotenv import load_dotenv
-from despedida import despedida
+from v2.servicios.despedida import despedida
 from servicios.detalle import detalle_de_la_deuda
 from servicios.recibo import solicitar_recibo
 from servicios.formas_y_lugares import formas_y_lugares_de_pago
 import function_calling
+from openai_repository import OpenAIChatClient
+from function_callingv2 import ChatBot
+from chat_message import ChatMessage
 
 load_dotenv()
 
-openai.api_key: str | None  = os.getenv('API_KEY')
-
-def get_completion_from_messages(messages: str):
-    """ conexion con openai mediante un historial de conversaciones y function callings
-
-    Args:
-        messages (str): el mensaje será proporcionado por el usuario el cual será derivado a las funciones si así lo infiere openai
-
-    Returns:
-        second_resonse (str) : respuesta de las diferentes funciones dentro de las function calling mencionadas en los tools
-        response_message (str): respuesta si el mensaje no se encuentra dentro de las funciones proporcionadas en los tools
-    """    
-
-    tools: list[dict] = [
+tools: list[dict] = [
                 {
                     "type": "function",
                     "function": {
@@ -69,40 +59,13 @@ def get_completion_from_messages(messages: str):
                     },
                 }
             ]
-    response: any = openai.chat.completions.create(
-        model='gpt-3.5-turbo-1106',
-        messages=messages,
-        tools=tools,
-        tool_choice="auto",
-        temperature=0,
-    )
-    response_message: any = response.choices[0].message
-    tool_calls: list[any] | None = response_message.tool_calls
-
-    if tool_calls:
-        available_functions: dict[str: any] = {
-            "detalle_de_la_deuda": detalle_de_la_deuda,
-            "solicitar_recibo": solicitar_recibo,
-            "formas_y_lugares_de_pago": formas_y_lugares_de_pago,
-            "despedida": despedida
-            }
-        messages.append(response_message)
-        
-        for tool_call in tool_calls:
-            function_name = tool_call.function.name
-            function_to_call = available_functions[function_name]
-            function_response = function_to_call()
-            messages.append(
-                {
-                    "tool_call_id": tool_call.id,
-                    "role": "tool",
-                    "name": function_name,
-                    "content": function_response,
-                }
-            )
-        return function_response
-    else:
-        return response_message.content
+    
+available_functions: dict[str: any] = {
+    "detalle_de_la_deuda": detalle_de_la_deuda,
+    "solicitar_recibo": solicitar_recibo,
+    "formas_y_lugares_de_pago": formas_y_lugares_de_pago,
+    "despedida": despedida
+}
 
 context: list[dict] = [ {'role':'system', 'content':"""
                         Eres un asistente virtual de Movistar, tu tarea principal es entregar informacion sobre el servicio telefonico. \
@@ -143,8 +106,8 @@ while True:
         context.append({'role': 'user', 'content': input_user.lower()})
         context.append({'role':'assistant', 'content': 'necesito consultar algunos datos para continuar con tu consulta. Por favor, ingresa el documento de identidad DNI numerico del titular del servicio'})
         context.append({'role': 'user', 'content': input_user.lower()})
-        response: str = get_completion_from_messages(context)
-        context.append({'role':'assistant', 'content': response})
-        print(f'Assistant: {response} \n')
+        response: str = ChatMessage(context, available_functions, tools)
+        context.append({'role':'assistant', 'content': response.result})
+        print(f'Assistant: {response.result} \n')
     else:
         break
